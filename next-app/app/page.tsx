@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react"
 
 import { Card, type CardData } from "@/components/Card"
 import Header from "@/components/Header"
+import { LineData, LineItem } from "@/components/LineItem"
 
 export default function Home() {
   const canvasRef = useRef()
@@ -90,18 +91,68 @@ export default function Home() {
     },
   ]
 
+  const lineData: LineData[] = [
+    {
+      city: "New York",
+      country: "United States",
+      riskScore: 7.2,
+      summary: "Someone was killed",
+    },
+    {
+      city: "New York",
+      country: "United States",
+      riskScore: 7.2,
+      summary: "Someone was killed",
+    },
+    {
+      city: "New York",
+      country: "United States",
+      riskScore: 7.2,
+      summary: "Someone was killed",
+    },
+    {
+      city: "New York",
+      country: "United States",
+      riskScore: 7.2,
+      summary: "Someone was killed",
+    },
+    {
+      city: "New York",
+      country: "United States",
+      riskScore: 7.2,
+      summary: "Someone was killed",
+    },
+  ]
+
   return (
     <main className="w-full">
       <Header />
-      <div className="flex w-full gap-4 overflow-x-auto py-4">
-        {cardData.map((props) => (
-          <Card {...props} />
-        ))}
+      <div className="flex flex-col gap-8">
+        <div className="flex w-full gap-4 overflow-x-auto py-4">
+          {cardData.map((props) => (
+            <Card {...props} />
+          ))}
+        </div>
+        <div className="grid grid-cols-2">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-semibold">Realtime monitoring</h2>
+            <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 px-6">
+              {lineData.map((props) => (
+                <LineItem {...props} />
+              ))}
+            </div>
+          </div>
+          <canvas
+            ref={canvasRef}
+            style={{
+              width: 600,
+              height: 600,
+              maxWidth: "100%",
+              aspectRatio: 1,
+            }}
+          />
+        </div>
       </div>
-      <canvas
-        ref={canvasRef}
-        style={{ width: 600, height: 600, maxWidth: "100%", aspectRatio: 1 }}
-      />
     </main>
   )
 }
