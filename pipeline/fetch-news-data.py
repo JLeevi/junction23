@@ -18,7 +18,8 @@ def main():
     bing_endpoint = os.environ["BING_SEARCH_V7_ENDPOINT"]
     event = os.environ["EVENT"]
     location = os.environ["LOCATION"]
-    account_url = os.environ["BLOB_ACCOUNT_URL"]
+    connection_string = os.environ["BLOB_CONNECTION_STRING"]
+
     headers = {"Ocp-Apim-Subscription-Key": subscription_key}
     count = 100
     params = {"mkt": "en-US", "q": f"{event} {location}", "count": count, "sortBy": "Date"}
@@ -42,8 +43,7 @@ def main():
     with open("data.json", 'w') as json_file:
         json.dump(result_data, json_file)
     
-    default_credential = DefaultAzureCredential()
-    blob_service_client = BlobServiceClient(account_url, credential=default_credential)
+    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(container="news-data", blob=f"data1.json")
     with open(file="data.json", mode="rb") as data:
         blob_client.upload_blob(data)
