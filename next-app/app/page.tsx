@@ -2,6 +2,7 @@
 
 import createGlobe from "cobe"
 import { useEffect, useRef } from "react"
+import Header from "@/components/Header"
 
 export default function Home() {
   const canvasRef = useRef()
@@ -41,8 +42,8 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="">
-      <h1>COBE</h1>
+    <main className="">
+      <Header />
       <p>
         A lightweight (5kB) WebGL globe lib:{" "}
         <a href="https://github.com/shuding/cobe" target="_blank">
@@ -53,6 +54,6 @@ export default function Home() {
         ref={canvasRef}
         style={{ width: 600, height: 600, maxWidth: "100%", aspectRatio: 1 }}
       />
-    </div>
+    </main>
   )
 }
