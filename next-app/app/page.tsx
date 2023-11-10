@@ -41,7 +41,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="App">
+    <div className="">
       <h1>COBE</h1>
       <p>
         A lightweight (5kB) WebGL globe lib:{" "}
