@@ -3,7 +3,6 @@ import json
 import requests
 from dotenv import load_dotenv
 import hashlib
-from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
 
@@ -46,7 +45,7 @@ def main():
     blob_service_client = BlobServiceClient.from_connection_string(connection_string)
     blob_client = blob_service_client.get_blob_client(container="news-data", blob=f"data1.json")
     with open(file="data.json", mode="rb") as data:
-        blob_client.upload_blob(data)
+        blob_client.upload_blob(data, overwrite=True)
 
 
 if __name__ == "__main__":
