@@ -1,7 +1,10 @@
 "use client"
 
 import createGlobe from "cobe"
+import { Factory } from "lucide-react"
 import { useEffect, useRef } from "react"
+
+import { Card, type CardData } from "@/components/Card"
 import Header from "@/components/Header"
 
 export default function Home() {
@@ -41,15 +44,57 @@ export default function Home() {
     }
   }, [])
 
+  const cardData: CardData[] = [
+    {
+      imagePath: "/logos/bloomberg.png",
+      title: "Bloomberg",
+      summary: "Someone was killed",
+      Icon: Factory,
+      city: "New York",
+      country: "United States",
+    },
+    {
+      imagePath: "/logos/bloomberg.png",
+      title: "Bloomberg",
+      summary: "Someone was killed",
+      Icon: Factory,
+      city: "New York",
+      country: "United States",
+    },
+    {
+      imagePath: "/logos/bloomberg.png",
+      title: "Bloomberg",
+      summary: "Someone was killed",
+      Icon: Factory,
+      city: "New York",
+      country: "United States",
+    },
+    {
+      imagePath: "/logos/bloomberg.png",
+      title: "Bloomberg",
+      summary: "Someone was killed",
+      Icon: Factory,
+      city: "New York",
+      country: "United States",
+    },
+    {
+      imagePath: "/logos/bloomberg.png",
+      title: "Bloomberg",
+      summary: "Someone was killed",
+      Icon: Factory,
+      city: "New York",
+      country: "United States",
+    },
+  ]
+
   return (
-    <main className="">
+    <main className="w-full">
       <Header />
-      <p>
-        A lightweight (5kB) WebGL globe lib:{" "}
-        <a href="https://github.com/shuding/cobe" target="_blank">
-          GitHub
-        </a>
-      </p>
+      <div className="flex w-full gap-4 overflow-x-auto py-4">
+        {cardData.map((props) => (
+          <Card {...props} />
+        ))}
+      </div>
       <canvas
         ref={canvasRef}
         style={{ width: 600, height: 600, maxWidth: "100%", aspectRatio: 1 }}
