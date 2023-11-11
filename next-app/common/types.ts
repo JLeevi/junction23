@@ -21,6 +21,7 @@ export interface Factory {
       lon: number
       lat: number
     }
+    flag: string
     city: string
     country: string
   }

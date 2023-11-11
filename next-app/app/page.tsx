@@ -9,18 +9,218 @@ import Header from "@/components/Header"
 import { LineItem } from "@/components/LineItem"
 import { Summary } from "@/components/Summary"
 
+const MOCK_WITHOUT_RISK: Factory[] = [
+  {
+    location: {
+      flag: "🇨🇴",
+      country: "Colombia",
+      city: "Bogota",
+      coordinates: {
+        lat: 4.678390790414742,
+        lon: -74.08310452775451,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇧🇷",
+      country: "Brazil",
+      city: "Onca Puma",
+      coordinates: {
+        lat: -6.605335306591729,
+        lon: -51.100066887737015,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇳🇱",
+      country: "Holland",
+      city: "Terneuzen",
+      coordinates: {
+        lat: 51.33013942257549,
+        lon: 3.83565678442852,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇿🇼",
+      country: "Zimbabwe",
+      city: "Harare",
+      coordinates: {
+        lat: -17.805176546407868,
+        lon: 31.046041795875578,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇩🇪",
+      country: "Germany",
+      city: "Berlin",
+      coordinates: {
+        lat: 52.558715181258684,
+        lon: 13.50432896407948,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇹🇷",
+      country: "Turkey",
+      city: "Ankara",
+      coordinates: {
+        lat: 39.96018250478697,
+        lon: 32.863076953317126,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+]
+
+const MOCK_WITH_RISK: Factory[] = [
+  {
+    location: {
+      flag: "🇨🇴",
+      country: "Colombia",
+      city: "Bogota",
+      coordinates: {
+        lat: 4.678390790414742,
+        lon: -74.08310452775451,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇧🇷",
+      country: "Brazil",
+      city: "Onca Puma",
+      coordinates: {
+        lat: -6.605335306591729,
+        lon: -51.100066887737015,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇳🇱",
+      country: "Holland",
+      city: "Terneuzen",
+      coordinates: {
+        lat: 51.33013942257549,
+        lon: 3.83565678442852,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇿🇼",
+      country: "Zimbabwe",
+      city: "Harare",
+      coordinates: {
+        lat: -17.805176546407868,
+        lon: 31.046041795875578,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+  {
+    location: {
+      flag: "🇩🇪",
+      country: "Germany",
+      city: "Berlin",
+      coordinates: {
+        lat: 52.558715181258684,
+        lon: 13.50432896407948,
+      },
+    },
+    risk_status: {
+      has_risk: true,
+      risk_title: "Potential disruption due to train derailment in Berlin",
+      risk_summary:
+        "A train transporting goods for local mining operations has derailed, leaving the mines without supplies.",
+      articles: [
+        {
+          title: "Train derailed in Berlin",
+          content:
+            "A massive accident has happened in Berlin. A train transporting goods for local mining operations has derailed, leaving the mines without supplies.",
+          url: "https://hs.fi",
+        },
+      ],
+    },
+  },
+  {
+    location: {
+      flag: "🇹🇷",
+      country: "Turkey",
+      city: "Ankara",
+      coordinates: {
+        lat: 39.96018250478697,
+        lon: 32.863076953317126,
+      },
+    },
+    risk_status: {
+      has_risk: false,
+    },
+  },
+]
+
+let useRisks = false
+
 export default function Home() {
-  type State =
-    | {
-        type: "loading"
-      }
-    | {
-        type: "allFactories"
-        factories: Factory[]
-      }
-  const [state, setState] = useState<State>({ type: "loading" })
+  const defaultLongitude = 0
+  const defaultLatitude = 0
+  const defaultZoom = 1.3
+  const [factories, setFactories] = useState<Factory[]>([])
   const [chosenFactory, setChosenFactory] = useState<Factory | null>(null)
-  const pollInterval = 10000
+  const pollInterval = 1000
+
+  // If the new blob of factories has a new risk, return one new factory
+  // Else, return undefined
+  const tryGetNewRisk = (oldFactories: Factory[], newFactories: Factory[]) => {
+    const newRedAlerts = newFactories.filter((f) => f.risk_status.has_risk)
+    const oldRedAlerts = oldFactories.filter((f) => f.risk_status.has_risk)
+    // Don't focus on first render
+    if (oldRedAlerts.length === 0) return
+    const newRedAlert = newRedAlerts.find(
+      (newF) =>
+        !oldRedAlerts.find((oldF) => oldF.location.city === newF.location.city),
+    )
+    return newRedAlert
+  }
+
+  const focusToNewRisk = (newRisk: Factory) => {
+    setChosenFactory(newRisk)
+  }
 
   const getSummaries = async () => {
     const response = await fetch("/api/summary", {
@@ -30,14 +230,24 @@ export default function Home() {
       },
     })
     const json = (await response.json()) as ServerResponse
-    console.log("JSON RESPONSE", json)
-    setState({ type: "allFactories", factories: json })
+
+    const oldFactories = factories
+    setFactories(json)
+    if (!oldFactories) return
+    const newRisk = tryGetNewRisk(oldFactories, json)
+    if (newRisk) focusToNewRisk(newRisk)
+    initializeMap()
   }
 
   useEffect(() => {
-    // Fetch data initially
-    getSummaries()
+    // set useRisks to true after 10 seconds
+    const timeoutId = setTimeout(() => {
+      useRisks = true
+    }, 10000)
+    return () => clearTimeout(timeoutId)
+  }, [])
 
+  useEffect(() => {
     // Set up the interval to poll every x seconds
     const intervalId = setInterval(() => {
       getSummaries()
@@ -45,21 +255,13 @@ export default function Home() {
 
     // Clean up the interval when the component is unmounted
     return () => clearInterval(intervalId)
-  }, [])
+  }, [factories])
 
   // const [map, setMap] = useState<mapboxgl.Map>()
   const mapboxID = "mapbox-globe"
 
-  let rotateInterval: NodeJS.Timeout
-
   const mapContainer = useRef(null)
   const map = useRef<mapboxgl.Map>(null)
-  const defaultLongitude = 0
-  const defaultLatitude = 0
-  const defaultZoom = 1.3
-  const [lon, setLng] = useState(defaultLongitude)
-  const [lat, setLat] = useState(defaultLatitude)
-  const [zoom, setZoom] = useState(defaultZoom)
 
   mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string
 
@@ -77,36 +279,18 @@ export default function Home() {
     })
   }
 
-  // Mapbox initialization code
-
-  function spinGlobe(globe: mapboxgl.Map) {
-    if (userInteracting) return
-    const secondsPerRevolution = 120
-    // Above zoom level 5, do not rotate.
-    const maxSpinZoom = 5
-    // Rotate at intermediate speeds between zoom levels 3 and 5.
-    const slowSpinZoom = 3
-
-    const zoom = globe.getZoom()
-    if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
-      let distancePerSecond = 360 / secondsPerRevolution
-      if (zoom > slowSpinZoom) {
-        // Slow spinning at higher zooms
-        const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom)
-        distancePerSecond *= zoomDif
-      }
-      const center = globe.getCenter()
-      center.lng -= distancePerSecond
-      if (center.lng <= -180) center.lng += 360
-      // Smoothly animate the map over one second.
-      // When this animation is complete, it calls a 'moveend' event.
-      globe.easeTo({ center, duration: 1000, easing: (n) => n })
-    }
-  }
-
   useEffect(() => {
+    if (!chosenFactory) return
+    goToLocation(
+      chosenFactory.location.coordinates.lat,
+      chosenFactory.location.coordinates.lon,
+      9,
+    )
+  }, [chosenFactory])
+
+  const initializeMap = () => {
     if (map.current) return // initialize map only once
-    if (state.type !== "allFactories") return
+    if (factories.length === 0) return
 
     // ignore ts error for setting map.current
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -114,14 +298,14 @@ export default function Home() {
     map.current = new mapboxgl.Map({
       container: mapboxID,
       style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
-      center: [lon, lat],
-      zoom: zoom,
+      center: [defaultLongitude, defaultLatitude],
+      zoom: defaultZoom,
 
       projection: {
         name: "globe",
       },
     })
-    for (const factory of state.factories) {
+    for (const factory of factories) {
       // create a HTML element for each feature
       const el = document.createElement("div")
       el.className = "marker"
@@ -136,65 +320,37 @@ export default function Home() {
         ])
         .addTo(map.current)
     }
+  }
 
-    spinGlobe(map.current)
-  }, [state.type])
-
-  // Init event handlers
   useEffect(() => {
-    const current = map.current
-    if (!current) return
-    // Pause spinning on interaction
-    current.on("mousedown", () => {
-      setUserInteracting(true)
-    })
+    if (map.current) return // initialize map only once
+    if (factories.length === 0) return
+    initializeMap()
+  }, [factories])
 
-    // Restart spinning the globe when interaction is complete
-    current.on("mouseup", () => {
-      setUserInteracting(false)
-      spinGlobe(current)
-    })
+  useEffect(() => {
+    if (factories.length === 0) return
+    for (const factory of factories) {
+      // create a HTML element for each feature
+      const el = document.createElement("div")
+      el.className = "marker"
 
-    // These events account for cases where the mouse has moved
-    // off the map, so 'mouseup' will not be fired.
-    current.on("dragend", () => {
-      setUserInteracting(false)
-      spinGlobe(current)
-    })
-    current.on("pitchend", () => {
-      setUserInteracting(false)
-      spinGlobe(current)
-    })
-    current.on("rotateend", () => {
-      setUserInteracting(false)
-      spinGlobe(current)
-    })
-
-    // When animation is complete, start spinning if there is no ongoing interaction
-    current.on("moveend", () => {
-      spinGlobe(current)
-    })
-  }, [])
-
-  const [userInteracting, setUserInteracting] = useState(false)
-  const [spinEnabled, setSpinEnabled] = useState(true)
-
-  // useEffect(() => {
-  //   if (!map.current) return
-  //   const current = map.current
-  //   if (userInteracting) {
-  //     current.stop()
-  //   } else if (!spinEnabled) {
-  //     current.stop()
-  //   } else {
-  //     spinGlobe(current)
-  //   }
-  // }, [userInteracting, spinEnabled, map.current])
+      // make a marker for each feature and add to the map
+      new mapboxgl.Marker({
+        color: factory.risk_status.has_risk ? "#F87171" : "#34D399",
+      })
+        .setLngLat([
+          factory.location.coordinates.lon,
+          factory.location.coordinates.lat,
+        ])
+        .addTo(map.current as any)
+    }
+  }, [factories])
 
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
       <Header />
-      {state.type === "loading" ? (
+      {factories.length === 0 ? (
         <div className="flex h-full w-full items-center justify-center">
           <div className="lds-ripple">
             <div></div>
@@ -208,7 +364,7 @@ export default function Home() {
             <Card>
               <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
                 {!chosenFactory ? (
-                  state.factories.map((data, i) => (
+                  factories.map((data, i) => (
                     <LineItem
                       {...data}
                       key={crypto.randomUUID()}
@@ -221,12 +377,7 @@ export default function Home() {
                       }
                       riskStatus={data.risk_status.has_risk ? "high" : "low"}
                       onButtonClick={() => {
-                        setChosenFactory(state.factories[i])
-                        goToLocation(
-                          data.location.coordinates.lat,
-                          data.location.coordinates.lon,
-                          9,
-                        )
+                        setChosenFactory(factories[i])
                       }}
                     />
                   ))
@@ -243,8 +394,8 @@ export default function Home() {
                     onBackButtonClick={() => {
                       setChosenFactory(null)
                       goToLocation(
-                        chosenFactory.location.coordinates.lat,
-                        chosenFactory.location.coordinates.lon,
+                        defaultLatitude,
+                        defaultLongitude,
                         defaultZoom,
                       )
                     }}
