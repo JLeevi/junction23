@@ -43,8 +43,8 @@ export default function Home() {
 
   const mapContainer = useRef(null)
   const map = useRef<mapboxgl.Map>(null)
-  const defaultLongitude = -70.9
-  const defaultLatitude = 42
+  const defaultLongitude = 0
+  const defaultLatitude = 0
   const defaultZoom = 1.3
   const [lon, setLng] = useState(defaultLongitude)
   const [lat, setLat] = useState(defaultLatitude)
@@ -68,6 +68,44 @@ export default function Home() {
 
   // Mapbox initialization code
 
+  function spinGlobe(globe: mapboxgl.Map) {
+    if (userInteracting) return
+    const secondsPerRevolution = 120
+    // Above zoom level 5, do not rotate.
+    const maxSpinZoom = 5
+    // Rotate at intermediate speeds between zoom levels 3 and 5.
+    const slowSpinZoom = 3
+
+    console.log("Longitude", globe.getCenter().lng)
+
+    const zoom = globe.getZoom()
+    if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
+      let distancePerSecond = 360 / secondsPerRevolution
+      if (zoom > slowSpinZoom) {
+        // Slow spinning at higher zooms
+        const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom)
+        distancePerSecond *= zoomDif
+      }
+      const center = globe.getCenter()
+      center.lng -= distancePerSecond
+      if (center.lng <= -180) center.lng += 360
+      // Smoothly animate the map over one second.
+      // When this animation is complete, it calls a 'moveend' event.
+      globe.easeTo({ center, duration: 1000, easing: (n) => n })
+    }
+  }
+
+  function startSpinning(globe: mapboxgl.Map) {
+    if (userInteracting) return
+    if (rotateInterval) clearInterval(rotateInterval)
+
+    rotateInterval = setInterval(() => {
+      if (!userInteracting && spinEnabled) {
+        spinGlobe(globe)
+      }
+    }, 1000) // Adjust the interval as needed
+  }
+
   useEffect(() => {
     if (map.current) return // initialize map only once
     if (state.type !== "allFactories") return
@@ -77,6 +115,7 @@ export default function Home() {
       style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
       center: [lon, lat],
       zoom: zoom,
+
       projection: {
         name: "globe",
       },
@@ -96,7 +135,57 @@ export default function Home() {
         ])
         .addTo(map.current)
     }
+
+    spinGlobe(map.current)
   }, [state.type])
+
+  // Init event handlers
+  useEffect(() => {
+    const current = map.current
+    if (!current) return
+    // Pause spinning on interaction
+    current.on("mousedown", () => {
+      setUserInteracting(true)
+      if (rotateInterval) clearInterval(rotateInterval)
+    })
+
+    // Restart spinning the globe when interaction is complete
+    current.on("mouseup", () => {
+      setUserInteracting(false)
+    })
+
+    // These events account for cases where the mouse has moved
+    // off the map, so 'mouseup' will not be fired.
+    current.on("dragend", () => {
+      setUserInteracting(false)
+    })
+    current.on("pitchend", () => {
+      setUserInteracting(false)
+    })
+    current.on("rotateend", () => {
+      setUserInteracting(false)
+    })
+
+    // When animation is complete, start spinning if there is no ongoing interaction
+    current.on("moveend", () => {
+      spinGlobe(current)
+    })
+  }, [])
+
+  const [userInteracting, setUserInteracting] = useState(false)
+  const [spinEnabled, setSpinEnabled] = useState(true)
+
+  useEffect(() => {
+    if (!map.current) return
+    const current = map.current
+    if (userInteracting) {
+      current.stop()
+    } else if (!spinEnabled) {
+      current.stop()
+    } else {
+      spinGlobe(current)
+    }
+  }, [userInteracting, spinEnabled, map.current])
 
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
