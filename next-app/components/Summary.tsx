@@ -2,18 +2,10 @@ import { LucideIcon, X } from "lucide-react"
 import { ComponentProps } from "react"
 
 import { RiskStatus } from "@/common/types"
+import { Article } from "@/common/types"
 
 import { Button } from "./Button"
 import { NewsCard } from "./NewsCard"
-
-interface Article {
-  country: string
-  city: string
-  author: string
-  summary: string
-  Icon: LucideIcon
-  imagePath: string
-}
 
 interface Props extends ComponentProps<"div"> {
   city: string
@@ -46,16 +38,14 @@ export const Summary = ({
         </p>
       </div>
       <div className="flex flex-col gap-2">
+        <h4 className="text-sm font-bold">Sources</h4>
         {articles.map((article) => {
           return (
             <NewsCard
-              key={article.summary}
-              imagePath={article.imagePath}
-              title={article.author}
-              summary={article.summary}
-              Icon={article.Icon}
-              city={article.city}
-              country={article.country}
+              key={article.content}
+              author={article.author}
+              summary={article.title}
+              url={article.url}
             />
           )
         })}

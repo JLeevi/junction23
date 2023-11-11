@@ -134,7 +134,11 @@ export default function Home() {
                   city={chosenFactory.location.city}
                   country={chosenFactory.location.country}
                   riskStatus={chosenFactory.risk_status}
-                  articles={[]}
+                  articles={
+                    chosenFactory.risk_status.has_risk
+                      ? chosenFactory.risk_status.articles
+                      : []
+                  }
                   onBackButtonClick={() => {
                     setChosenFactory(null)
                     goToLocation(
