@@ -50,14 +50,14 @@ export default function Home() {
   const [lat, setLat] = useState(defaultLatitude)
   const [zoom, setZoom] = useState(defaultZoom)
 
-  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string
 
   const goToLocation = (
     latitude: number,
     longitude: number,
     zoom: number = defaultZoom,
   ) => {
-    map.current.flyTo({
+    map.current?.flyTo({
       center: [longitude, latitude],
       essential: true, // this animation is considered essential with respect to prefers-reduced-motion
       speed: 3, // make the flying slow
