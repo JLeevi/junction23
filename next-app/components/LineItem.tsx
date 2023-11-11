@@ -1,6 +1,7 @@
 import { ChevronRightIcon } from "lucide-react"
 import { ComponentProps } from "react"
 
+import { Button } from "./Button"
 import { Label, intent } from "./Label"
 
 export interface LineData {
@@ -28,7 +29,7 @@ export const LineItem = ({ city, country, summary, riskScore }: Props) => {
   }
 
   return (
-    <div className="flex justify-between gap-4 py-6">
+    <div className="flex items-center justify-between gap-4 py-6">
       <div className="flex flex-col gap-2 ">
         <div className="flex items-center gap-3">
           <h3 className="font-bold text-slate-900">
@@ -38,9 +39,7 @@ export const LineItem = ({ city, country, summary, riskScore }: Props) => {
         </div>
         <p className="text-sm text-slate-900">{summary}</p>
       </div>
-      <button className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-slate-200 bg-slate-100 text-slate-500 transition-all hover:bg-slate-200 active:border-slate-300 active:bg-slate-300">
-        <ChevronRightIcon />
-      </button>
+      <Button Icon={ChevronRightIcon} />
     </div>
   )
 }
