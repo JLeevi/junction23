@@ -128,7 +128,7 @@ export default function Home() {
     <main className="w-full">
       <Header />
       <div className="flex flex-col gap-8">
-        <div className="flex w-full gap-4 overflow-x-auto py-4">
+        <div className="hidden-scrollbar flex w-full gap-4 overflow-x-auto py-4">
           {cardData.map((props) => (
             <Card {...props} />
           ))}
