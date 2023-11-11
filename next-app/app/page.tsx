@@ -101,65 +101,74 @@ export default function Home() {
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
       <Header />
-      <div className="grid h-full grid-cols-2 gap-4 pb-24">
-        <div className="flex h-full flex-col justify-center gap-4 ">
-          <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-          <Card>
-            <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-              {state.type === "allFactories" && !chosenFactory ? (
-                state.factories.map((data, i) => (
-                  <LineItem
-                    {...data}
-                    key={crypto.randomUUID()}
-                    country={data.location.country}
-                    city={data.location.city}
-                    summary={
-                      data.risk_status.has_risk
-                        ? data.risk_status.risk_title
-                        : "Status stable"
+      {state.type === "loading" ? (
+        <div className="flex h-full w-full items-center justify-center">
+          <div className="lds-ripple">
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid h-full grid-cols-2 gap-4 pb-24">
+          <div className="flex h-full flex-col justify-center gap-4 ">
+            <h2 className="text-xl font-semibold">Realtime monitoring</h2>
+            <Card>
+              <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
+                {!chosenFactory ? (
+                  state.factories.map((data, i) => (
+                    <LineItem
+                      {...data}
+                      key={crypto.randomUUID()}
+                      country={data.location.country}
+                      city={data.location.city}
+                      summary={
+                        data.risk_status.has_risk
+                          ? data.risk_status.risk_title
+                          : "Status stable"
+                      }
+                      riskStatus={data.risk_status.has_risk ? "high" : "low"}
+                      onButtonClick={() => {
+                        setChosenFactory(state.factories[i])
+                        goToLocation(
+                          data.location.coordinates.lat,
+                          data.location.coordinates.lon,
+                          9,
+                        )
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Summary
+                    city={chosenFactory.location.city}
+                    country={chosenFactory.location.country}
+                    riskStatus={chosenFactory.risk_status}
+                    articles={
+                      chosenFactory.risk_status.has_risk
+                        ? chosenFactory.risk_status.articles
+                        : []
                     }
-                    riskStatus={data.risk_status.has_risk ? "high" : "low"}
-                    onButtonClick={() => {
-                      setChosenFactory(state.factories[i])
+                    onBackButtonClick={() => {
+                      setChosenFactory(null)
                       goToLocation(
-                        data.location.coordinates.lat,
-                        data.location.coordinates.lon,
-                        9,
+                        chosenFactory.location.coordinates.lat,
+                        chosenFactory.location.coordinates.lon,
+                        defaultZoom,
                       )
                     }}
                   />
-                ))
-              ) : state.type === "allFactories" && chosenFactory ? (
-                <Summary
-                  city={chosenFactory.location.city}
-                  country={chosenFactory.location.country}
-                  riskStatus={chosenFactory.risk_status}
-                  articles={
-                    chosenFactory.risk_status.has_risk
-                      ? chosenFactory.risk_status.articles
-                      : []
-                  }
-                  onBackButtonClick={() => {
-                    setChosenFactory(null)
-                    goToLocation(
-                      chosenFactory.location.coordinates.lat,
-                      chosenFactory.location.coordinates.lon,
-                      defaultZoom,
-                    )
-                  }}
-                />
-              ) : null}
-            </div>
-          </Card>
+                )}
+              </div>
+            </Card>
+          </div>
+          <div className="flex flex-col justify-center">
+            <div
+              ref={mapContainer}
+              className="flex aspect-square w-full flex-col"
+              id={mapboxID}
+            ></div>
+          </div>
         </div>
-        <div className="flex flex-col justify-center">
-          <div
-            ref={mapContainer}
-            className="flex aspect-square w-full flex-col"
-            id={mapboxID}
-          ></div>
-        </div>
-      </div>
+      )}
     </main>
   )
 }
