@@ -2,7 +2,7 @@
 
 import createGlobe from "cobe"
 import { Factory } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { type CardData } from "@/components/Card"
 import Header from "@/components/Header"
@@ -123,6 +123,7 @@ export default function Home() {
     ]
   }
   const focusRef = useRef([0, 0])
+  const [isRotating, setRotating] = useState(true)
 
   useEffect(() => {
     let width = 0
@@ -155,25 +156,30 @@ export default function Home() {
       width: 600 * 2,
       height: 600 * 2,
       onRender: (state) => {
-        state.phi = currentPhi
-        state.theta = currentTheta
-        const [focusPhi, focusTheta] = focusRef.current
-        const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
-        const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
-        // Control the speed
-        if (distPositive < distNegative) {
-          currentPhi += distPositive * 0.08
+        if (isRotating) {
+          state.phi = currentPhi
+          currentPhi += 0.001
         } else {
-          currentPhi -= distNegative * 0.08
+          state.phi = currentPhi
+          state.theta = currentTheta
+          const [focusPhi, focusTheta] = focusRef.current
+          const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
+          const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
+          // Control the speed
+          if (distPositive < distNegative) {
+            currentPhi += distPositive * 0.08
+          } else {
+            currentPhi -= distNegative * 0.08
+          }
+          currentTheta = currentTheta * 0.92 + focusTheta * 0.08
+          state.width = width * 2
+          state.height = width * 2
         }
-        currentTheta = currentTheta * 0.92 + focusTheta * 0.08
-        state.width = width * 2
-        state.height = width * 2
       },
     })
 
     return () => globe.destroy()
-  }, [])
+  }, [isRotating])
 
   return (
     <main className="w-full">
@@ -207,6 +213,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   focusRef.current = locationToAngles(latitude, longitude)
+                  setRotating(false)
                 }}
               >
                 📍 {city}
