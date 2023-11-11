@@ -4,15 +4,15 @@ import createGlobe from "cobe"
 import { Factory } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-import { type CardData } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineData, LineItem } from "@/components/LineItem"
+import { type NewsCardData } from "@/components/NewsCard"
 import { NewsFeed } from "@/components/NewsFeed"
 
 export default function Home() {
   const canvasRef = useRef()
 
-  const cardData: CardData[] = [
+  const cardData: NewsCardData[] = [
     {
       imagePath: "/logos/bloomberg.png",
       title: "Bloomberg",

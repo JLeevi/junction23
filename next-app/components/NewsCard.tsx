@@ -3,7 +3,7 @@ import { ComponentProps } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
-export interface CardData {
+export interface NewsCardData {
   imagePath: string
   title: string
   summary: string
@@ -12,9 +12,9 @@ export interface CardData {
   country: string
 }
 
-type Props = CardData & ComponentProps<"div">
+type Props = NewsCardData & ComponentProps<"div">
 
-export const Card = ({
+export const NewsCard = ({
   imagePath,
   title,
   summary,
