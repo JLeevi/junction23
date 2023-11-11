@@ -38,17 +38,21 @@ export const Summary = ({
         </p>
       </div>
       <div className="flex flex-col gap-2">
-        <h4 className="text-sm font-bold">Sources</h4>
-        {articles.map((article) => {
-          return (
-            <NewsCard
-              key={article.content}
-              author={article.author}
-              summary={article.title}
-              url={article.url}
-            />
-          )
-        })}
+        {articles.length > 0 && (
+          <>
+            <h4 className="text-sm font-bold">Sources</h4>
+            {articles.map((article) => {
+              return (
+                <NewsCard
+                  key={article.content}
+                  author={article.author}
+                  summary={article.title}
+                  url={article.url}
+                />
+              )
+            })}
+          </>
+        )}
       </div>
     </div>
   )
