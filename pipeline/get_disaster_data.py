@@ -15,8 +15,8 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 # Check if event is happening close to location
 # Closeness depends on alert level
 def is_relevant_event_for_location(event_lat, event_lon, alert_level, location):
-    location_lat = location["coordinates"][0]
-    location_lon = location["coordinates"][1]
+    location_lat = location["coordinates"]["lat"]
+    location_lon = location["coordinates"]["lon"]
     distance = calculate_distance(
         location_lat, location_lon, event_lat, event_lon)
     if alert_level == "Green" and distance < 100:

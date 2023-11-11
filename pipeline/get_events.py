@@ -10,7 +10,10 @@ NEWS_QUERIES = [
         "location": {
             "country": "Colombia",
             "city": "Bogota",
-            "coordinates": [4.678390790414742, -74.08310452775451],
+            "coordinates": {
+                "lat": 4.678390790414742,
+                "lon": -74.08310452775451,
+            }
         },
         "events": [
             "natural disaster",
@@ -21,7 +24,10 @@ NEWS_QUERIES = [
         "location": {
             "country": "Guatemala",
             "city": "El Estor",
-            "coordinates": [15.5322197047923, -89.33265507494376],
+            "coordinates": {
+                "lat": 15.5322197047923,
+                "lon": -89.33265507494376,
+            }
         },
         "events": [
             "natural disaster",
@@ -32,7 +38,10 @@ NEWS_QUERIES = [
         "location": {
             "country": "Brazil",
             "city": "Onca Puma",
-            "coordinates": [-6.605335306591729, -51.100066887737015],
+            "coordinates": {
+                "lat": -6.605335306591729,
+                "lon": -51.100066887737015,
+            }
         },
         "events": [
             "natural disaster",
@@ -43,7 +52,10 @@ NEWS_QUERIES = [
         "location": {
             "country": "Holland",
             "city": "Terneuzen",
-            "coordinates": [51.33013942257549, 3.83565678442852],
+            "coordinates": {
+                "lat": 51.33013942257549,
+                "lon": 3.83565678442852,
+            }
         },
         "events": [
             "natural disaster",
