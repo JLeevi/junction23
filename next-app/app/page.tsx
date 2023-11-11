@@ -47,7 +47,7 @@ export default function Home() {
   const map = useRef<mapboxgl.Map>(null)
   const defaultLongitude = -70.9
   const defaultLatitude = 42
-  const defaultZoom = 1
+  const defaultZoom = 1.3
   const [lon, setLng] = useState(defaultLongitude)
   const [lat, setLat] = useState(defaultLatitude)
   const [zoom, setZoom] = useState(defaultZoom)
