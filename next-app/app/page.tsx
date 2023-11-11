@@ -1,92 +1,41 @@
 "use client"
 
 import createGlobe from "cobe"
-import { Factory } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-import { type CardData } from "@/components/Card"
+import type { Factory, ServerResponse } from "@/common/types"
+import { Card } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineData, LineItem } from "@/components/LineItem"
 import { NewsFeed } from "@/components/NewsFeed"
+import { Summary } from "@/components/Summary"
+import { factories } from "@/data/data"
+import { animated, useSpring } from "@react-spring/web"
 
 export default function Home() {
+  const getSummaries = async (): Promise<ServerResponse> => {
+    const response = await fetch("/api/summary", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    const json = (await response.json()) as ServerResponse
+    return json
+  }
+
   const canvasRef = useRef()
 
-  const cardData: CardData[] = [
-    {
-      imagePath: "/logos/bloomberg.png",
-      title: "Bloomberg",
-      summary: "Someone was killed",
-      Icon: Factory,
-      city: "New York",
-      country: "United States",
-    },
-    {
-      imagePath: "/logos/bloomberg.png",
-      title: "Bloomberg",
-      summary: "Someone was killed",
-      Icon: Factory,
-      city: "New York",
-      country: "United States",
-    },
-    {
-      imagePath: "/logos/bloomberg.png",
-      title: "Bloomberg",
-      summary: "Someone was killed",
-      Icon: Factory,
-      city: "New York",
-      country: "United States",
-    },
-    {
-      imagePath: "/logos/bloomberg.png",
-      title: "Bloomberg",
-      summary: "Someone was killed",
-      Icon: Factory,
-      city: "New York",
-      country: "United States",
-    },
-    {
-      imagePath: "/logos/bloomberg.png",
-      title: "Bloomberg",
-      summary: "Someone was killed",
-      Icon: Factory,
-      city: "New York",
-      country: "United States",
-    },
-  ]
-
-  const lineData: LineData[] = [
-    {
-      city: "New York",
-      country: "United States",
-      riskScore: 7.2,
-      summary: "Someone was killed",
-    },
-    {
-      city: "New York",
-      country: "United States",
-      riskScore: 7.2,
-      summary: "Someone was killed",
-    },
-    {
-      city: "New York",
-      country: "United States",
-      riskScore: 7.2,
-      summary: "Someone was killed",
-    },
-    {
-      city: "New York",
-      country: "United States",
-      riskScore: 7.2,
-      summary: "Someone was killed",
-    },
-    {
-      city: "New York",
-      country: "United States",
-      riskScore: 7.2,
-      summary: "Someone was killed",
-    },
-  ]
+  const lineData: LineData[] = factories.map((factory) => {
+    return {
+      city: factory.location.city,
+      country: factory.location.country,
+      summary: factory.risk_status.has_risk
+        ? factory.risk_status.risk_summary
+        : "Status stable",
+      riskStatus: factory.risk_status.has_risk ? "high" : "low",
+    }
+  })
 
   interface Location {
     city: string
@@ -124,6 +73,26 @@ export default function Home() {
   }
   const focusRef = useRef([0, 0])
   const [isRotating, setRotating] = useState(true)
+
+  type State =
+    | {
+        type: "default"
+        factories: Factory[]
+      }
+    | {
+        type: "loading"
+        factories: Factory[]
+      }
+    | {
+        type: "factoryDetails"
+        factory: Factory
+      }
+
+  const [state, setState] = useState<State>({ type: "default", factories })
+  const newsFeedSpring = useSpring({
+    opacity: state.type === "default" ? 1 : 0,
+    height: state.type === "default" ? "auto" : 0,
+  })
 
   useEffect(() => {
     let width = 0
@@ -185,15 +154,52 @@ export default function Home() {
     <main className="w-full">
       <Header />
       <div className="flex flex-col gap-8">
-        <NewsFeed cardData={cardData} />
+        {/* <animated.div style={newsFeedSpring}>
+          <NewsFeed cardData={cardData} />
+        </animated.div> */}
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-            <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 bg-white px-6">
-              {lineData.map((props) => (
-                <LineItem key={crypto.randomUUID()} {...props} />
-              ))}
-            </div>
+            <Card>
+              <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
+                {state.type != "factoryDetails" ? (
+                  state.factories.map((data, i) => (
+                    <LineItem
+                      {...data}
+                      key={crypto.randomUUID()}
+                      country={data.location.country}
+                      city={data.location.city}
+                      summary={
+                        data.risk_status.has_risk
+                          ? data.risk_status.risk_summary
+                          : "Status stable"
+                      }
+                      riskStatus={data.risk_status.has_risk ? "high" : "low"}
+                      onButtonClick={() => {
+                        setState({
+                          type: "loading",
+                          factories: state.factories,
+                        })
+                        setState({
+                          type: "factoryDetails",
+                          factory: factories[i],
+                        })
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Summary
+                    city={state.factory.location.city}
+                    country={state.factory.location.country}
+                    riskStatus={state.factory.risk_status}
+                    articles={[]}
+                    onBackButtonClick={() =>
+                      setState({ type: "default", factories })
+                    }
+                  />
+                )}
+              </div>
+            </Card>
           </div>
           <canvas
             ref={canvasRef}
