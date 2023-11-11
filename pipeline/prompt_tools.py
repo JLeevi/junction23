@@ -59,7 +59,7 @@ def get_tool_for_location(location):
                         },
                         "articles": {
                             "type": "array",
-                            "description": "The articles related to the risk. Empty array returned if has_risk is false.",
+                            "description": "Must be included, whenever has_risk is True. Contains information of the articles that describe the risk.",
                             "items": {
                                 "type": "object",
                                 "properties": {
@@ -79,7 +79,7 @@ def get_tool_for_location(location):
                             },
                         },
                     },
-                    "required": ["has_risk", "articles"],
+                    "required": ["has_risk"],
                 },
             },
         },
