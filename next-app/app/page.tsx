@@ -101,7 +101,7 @@ export default function Home() {
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
       <Header />
-      <div className="grid h-full grid-cols-2 gap-4">
+      <div className="grid h-full grid-cols-2 gap-4 pb-24">
         <div className="flex h-full flex-col justify-center gap-4 ">
           <h2 className="text-xl font-semibold">Realtime monitoring</h2>
           <Card>
