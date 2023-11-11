@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "Fetching news data..."
-python fetch-news-api.py
+poetry run python fetch-news-data.py
 
 echo "Fetcing disaster data..."
-python fetch-disaster-data.py
+poetry run python fetch-disaster-data.py
 
 echo "Script completed."
