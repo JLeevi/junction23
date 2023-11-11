@@ -191,7 +191,7 @@ export default function Home() {
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
             <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 bg-white px-6">
               {lineData.map((props) => (
-                <LineItem {...props} />
+                <LineItem key={crypto.randomUUID()} {...props} />
               ))}
             </div>
           </div>
@@ -211,6 +211,7 @@ export default function Home() {
             Rotate to:
             {locations.map(({ city, latitude, longitude }) => (
               <button
+                key={crypto.randomUUID()}
                 onClick={() => {
                   focusRef.current = locationToAngles(latitude, longitude)
                   setRotating(false)

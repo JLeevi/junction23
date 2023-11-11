@@ -14,7 +14,7 @@ export const NewsFeed = ({ cardData, ...props }: Props) => {
         className="hidden-scrollbar linear fade-sides flex w-full gap-4 overflow-x-auto px-2 py-4"
       >
         {cardData.map((card) => (
-          <Card {...card} />
+          <Card key={crypto.randomUUID()} {...card} />
         ))}
       </div>
       <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-slate-50 to-transparent"></div>
