@@ -5,9 +5,15 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from azure.storage.blob import BlobServiceClient
+from geopy.distance import geodesic
 
 
-def parse_xml(content_xml):
+def calculate_distance(lat1, lon1, lat2, lon2):
+    coords1 = (lat1, lon1)
+    coords2 = (lat2, lon2)
+    return geodesic(coords1, coords2).kilometers
+
+def parse_xml(content_xml, locations):
     root = ET.fromstring(content_xml)
     result_data = {"alert_data": []}
     for item in root.findall('.//item'):
@@ -32,18 +38,35 @@ def parse_xml(content_xml):
             "alert_score": alert_score,
             "calculation_type": calculation_type,
             "severity_level": severity_level,
-            "country": country
+            "country": country,
+            "locations_affected": []
         }
+
+        for location in locations:
+            distance = calculate_distance(location["lat"], location["lon"], lat, lon)
+            if alert_level == "Green" and distance < 100:
+                result_json["locations_affected"].append(location["name"])
+            elif alert_level == "Orange" and distance < 1000:
+                result_json["locations_affected"].append(location["name"])
+            elif alert_level == "Red" < 10000:
+                result_json["locations_affected"].append(location["name"])
+
         result_data["alert_data"].append(result_json)
     return result_data
 
 def main():
     load_dotenv()
     connection_string = os.environ["BLOB_CONNECTION_STRING"]
+    locations = [
+        {"name": "El Estor", "lat": "15.5322197047923", "lon": "-89.33265507494376"},
+        {"name": "Bogota", "lat": "4.678390790414742", "lon": "-74.08310452775451"},
+        {"name": "Onca Puma", "lat": "-6.605335306591729", "lon": "-51.100066887737015"},
+        {"name": "Terneuzen", "lat": "51.33013942257549", "lon": "3.83565678442852"},
+    ]
     url = "https://www.gdacs.org/xml/rss.xml"
     response = requests.get(url)
     content_xml = response.content.decode("utf-8")
-    result_data = parse_xml(content_xml)
+    result_data = parse_xml(content_xml, locations)
 
     with open("data.json", 'w') as json_file:
         json.dump(result_data, json_file)
