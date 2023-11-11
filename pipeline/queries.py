@@ -5,6 +5,7 @@
 NEWS_QUERIES = [
     {
         "location": {
+            "flag": "🇨🇴",
             "country": "Colombia",
             "city": "Bogota",
             "coordinates": {
@@ -19,6 +20,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇬🇹",
             "country": "Guatemala",
             "city": "El Estor",
             "coordinates": {
@@ -33,6 +35,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇧🇷",
             "country": "Brazil",
             "city": "Onca Puma",
             "coordinates": {
@@ -47,6 +50,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇳🇱",
             "country": "Holland",
             "city": "Terneuzen",
             "coordinates": {
@@ -61,6 +65,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇿🇼",
             "country": "Zimbabwe",
             "city": "Harare",
             "coordinates": {
@@ -75,6 +80,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇩🇪",
             "country": "Germany",
             "city": "Berlin",
             "coordinates": {
@@ -89,6 +95,7 @@ NEWS_QUERIES = [
     },
     {
         "location": {
+            "flag": "🇹🇷",
             "country": "Turkey",
             "city": "Ankara",
             "coordinates": {
