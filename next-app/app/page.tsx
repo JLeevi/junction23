@@ -88,7 +88,9 @@ export default function Home() {
       el.className = "marker"
 
       // make a marker for each feature and add to the map
-      new mapboxgl.Marker()
+      new mapboxgl.Marker({
+        color: factory.risk_status.has_risk ? "#F87171" : "#34D399",
+      })
         .setLngLat([
           factory.location.coordinates.lon,
           factory.location.coordinates.lat,
@@ -98,10 +100,10 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="grid w-full grid-rows-[auto_minmax(0,_1fr)]">
+    <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
       <Header />
-      <div className="grid grid-cols-2 items-center gap-4">
-        <div className="flex flex-col gap-4">
+      <div className="grid h-full grid-cols-2 gap-4">
+        <div className="flex h-full flex-col justify-center gap-4 ">
           <h2 className="text-xl font-semibold">Realtime monitoring</h2>
           <Card>
             <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
@@ -154,11 +156,13 @@ export default function Home() {
             </div>
           </Card>
         </div>
-        <div
-          ref={mapContainer}
-          className="flex h-full w-full flex-col"
-          id={mapboxID}
-        ></div>
+        <div className="flex flex-col justify-center">
+          <div
+            ref={mapContainer}
+            className="flex aspect-square w-full flex-col"
+            id={mapboxID}
+          ></div>
+        </div>
       </div>
     </main>
   )
