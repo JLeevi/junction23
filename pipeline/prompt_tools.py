@@ -59,7 +59,7 @@ def get_tool_for_location(location):
                         },
                         "articles": {
                             "type": "array",
-                            "description": "Given if there is a risk. The articles that support the risk.",
+                            "description": "The articles related to the risk. Empty if there is no risk.",
                             "items": {
                                 "type": "object",
                                 "properties": {
@@ -79,7 +79,7 @@ def get_tool_for_location(location):
                             },
                         },
                     },
-                    "required": ["has_risk"],
+                    "required": ["has_risk", "articles"],
                 },
             },
         },
