@@ -58,5 +58,47 @@ NEWS_QUERIES = [
             "natural disaster",
             "workers strike",
         ],
+    },
+    {
+        "location": {
+            "country": "Zimbabwe",
+            "city": "Harare",
+            "coordinates": {
+                "lat": -17.805176546407868,
+                "lon": 31.046041795875578,
+            }
+        },
+        "events": [
+            "natural disaster",
+            "workers strike",
+        ],
+    },
+    {
+        "location": {
+            "country": "Germany",
+            "city": "Berlin",
+            "coordinates": {
+                "lat": 52.558715181258684,
+                "lon": 13.50432896407948,
+            }
+        },
+        "events": [
+            "natural disaster",
+            "workers strike",
+        ],
+    },
+    {
+        "location": {
+            "country": "Turkey",
+            "city": "Ankara",
+            "coordinates": {
+                "lat": 39.96018250478697,
+                "lon": 32.863076953317126,
+            }
+        },
+        "events": [
+            "natural disaster",
+            "workers strike",
+        ],
     }
 ]
