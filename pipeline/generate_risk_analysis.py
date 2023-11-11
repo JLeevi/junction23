@@ -50,11 +50,9 @@ def main():
         file.write(download_stream.readall())
 
     risk_statuses = []
-    print(f"Loading events from {EVENTS_JSON_LOCATION}...")
     with open(EVENTS_JSON_LOCATION, "r") as json_file:
         all_events = json.load(json_file)
 
-    print("Generating risk statuses...")
     for query in NEWS_QUERIES:
         completion = get_completion_for_location(query["location"], all_events)
         risk_status = parse_risk_status_from_completion(completion)
@@ -63,10 +61,8 @@ def main():
             "risk_status": risk_status
         })
 
-    print("Saving risk statuses...")
     with open(RISK_STATUS_JSON_LOCATION, "w") as json_file:
         json.dump(risk_statuses, json_file, indent=4)
-    print(f"Risk statuses saved to {RISK_STATUS_JSON_LOCATION}")
     blob_client = blob_service_client.get_blob_client(
         container="web-input", blob=f"risk_status.json")
     with open(file=RISK_STATUS_JSON_LOCATION, mode="rb") as data:
