@@ -8,7 +8,6 @@ import Header from "@/components/Header"
 import { LineItem } from "@/components/LineItem"
 import { Summary } from "@/components/Summary"
 import { factories } from "@/data/data"
-import { animated, useSpring } from "@react-spring/web"
 
 export default function Home() {
   const getSummaries = async (): Promise<ServerResponse> => {
@@ -37,18 +36,11 @@ export default function Home() {
       }
 
   const [state, setState] = useState<State>({ type: "default", factories })
-  const newsFeedSpring = useSpring({
-    opacity: state.type === "default" ? 1 : 0,
-    height: state.type === "default" ? "auto" : 0,
-  })
 
   return (
     <main className="w-full">
       <Header />
       <div className="flex flex-col gap-8">
-        {/* <animated.div style={newsFeedSpring}>
-          <NewsFeed cardData={cardData} />
-        </animated.div> */}
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
