@@ -1,4 +1,3 @@
-import json
 import os
 import requests
 from dotenv import load_dotenv
@@ -8,7 +7,6 @@ load_dotenv()
 BING_KEY = os.environ["BING_SEARCH_V7_SUBSCRIPTION_KEY"]
 BING_API_ENDPOINT = os.environ["BING_SEARCH_V7_ENDPOINT"]
 
-
 def get_news_for_query(query="", count=100):
     headers = {"Ocp-Apim-Subscription-Key": BING_KEY}
     params = {"mkt": "en-US", "q": query, "count": count, "sortBy": "Date"}
@@ -16,7 +14,6 @@ def get_news_for_query(query="", count=100):
     response.raise_for_status()
     news_articles = response.json()
     return news_articles
-
 
 def fetch_news_articles(queries):
     all_articles = []

@@ -5,16 +5,15 @@ from datetime import datetime
 
 API_URL = "https://www.gdacs.org/xml/rss.xml"
 
-
 def calculate_distance(lat1, lon1, lat2, lon2):
     coords1 = (lat1, lon1)
     coords2 = (lat2, lon2)
     return geodesic(coords1, coords2).kilometers
 
-
-# Check if event is happening close to location
-# Closeness depends on alert level
 def is_relevant_event_for_location(event_lat, event_lon, alert_level, location):
+    """Checks if the event is happening close to location. Closeness depends on 
+    alert level.
+    """
     location_lat = location["coordinates"]["lat"]
     location_lon = location["coordinates"]["lon"]
     distance = calculate_distance(
@@ -27,7 +26,6 @@ def is_relevant_event_for_location(event_lat, event_lon, alert_level, location):
         return True
     else:
         return False
-
 
 def parse_events_from_disaster_xml(locations, content_xml):
     root = ET.fromstring(content_xml)
@@ -61,11 +59,11 @@ def parse_events_from_disaster_xml(locations, content_xml):
         if len(result_json["locations_affected"]) > 0:
             result_data.append(result_json)
     return result_data
-
-
-# Generates articles for each location affected by a single disaster
-# Formatted similar to news articles
+ 
 def generate_articles_for_disaster(disaster):
+    """Generates articles for each location affected by a single disaster.
+    Formatted similar to news articles.
+    """
     articles = []
     for location in disaster["locations_affected"]:
 
@@ -82,10 +80,10 @@ def generate_articles_for_disaster(disaster):
         )
     return articles
 
-
-# Fetches disaster articles from GDACS
-# Returns a list of articles formatted similar to news articles
 def fetch_disaster_articles(locations):
+    """Fetches disaster articles from GDACS.
+    Returns a list of articles formatted similar to news articles
+    """
     response = requests.get(API_URL)
     content_xml = response.content.decode("utf-8")
     disasters = parse_events_from_disaster_xml(locations, content_xml)
