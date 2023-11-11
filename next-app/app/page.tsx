@@ -108,6 +108,9 @@ export default function Home() {
     if (map.current) return // initialize map only once
     if (state.type !== "allFactories") return
 
+    // ignore ts error for setting map.current
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     map.current = new mapboxgl.Map({
       container: mapboxID,
       style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
