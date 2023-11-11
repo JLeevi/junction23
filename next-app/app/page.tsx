@@ -9,8 +9,17 @@ import Header from "@/components/Header"
 import { LineData, LineItem } from "@/components/LineItem"
 import { type NewsCardData } from "@/components/NewsCard"
 import { NewsFeed } from "@/components/NewsFeed"
+import { animated, useSpring } from "@react-spring/web"
 
 export default function Home() {
+  const getSummaries = () =>
+    fetch("/api/summary", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
   const canvasRef = useRef()
 
   const cardData: NewsCardData[] = [
@@ -126,6 +135,13 @@ export default function Home() {
   const focusRef = useRef([0, 0])
   const [isRotating, setRotating] = useState(true)
 
+  // For newsfeed removal animation
+  const [showNewsFeed, setShowNewsFeed] = useState(true)
+  const newsFeedSpring = useSpring({
+    opacity: showNewsFeed ? 1 : 0,
+    height: showNewsFeed ? "auto" : 0,
+  })
+
   useEffect(() => {
     let width = 0
     let currentPhi = 0
@@ -186,14 +202,23 @@ export default function Home() {
     <main className="w-full">
       <Header />
       <div className="flex flex-col gap-8">
-        <NewsFeed cardData={cardData} />
+        <animated.div style={newsFeedSpring}>
+          <NewsFeed cardData={cardData} />
+        </animated.div>
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
             <Card>
               <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-                {lineData.map((props) => (
-                  <LineItem key={crypto.randomUUID()} {...props} />
+                {lineData.map((data) => (
+                  <LineItem
+                    {...data}
+                    key={crypto.randomUUID()}
+                    onButtonClick={() => {
+                      console.log("clicked")
+                      setShowNewsFeed(false)
+                    }}
+                  />
                 ))}
               </div>
             </Card>

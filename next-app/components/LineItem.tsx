@@ -1,5 +1,4 @@
 import { ChevronRightIcon } from "lucide-react"
-import { ComponentProps } from "react"
 
 import { Button } from "./Button"
 import { Label, intent } from "./Label"
@@ -11,9 +10,17 @@ export interface LineData {
   riskScore: number
 }
 
-type Props = LineData & ComponentProps<"div">
+type Props = LineData & {
+  onButtonClick: () => void
+}
 
-export const LineItem = ({ city, country, summary, riskScore }: Props) => {
+export const LineItem = ({
+  city,
+  country,
+  summary,
+  riskScore,
+  onButtonClick,
+}: Props) => {
   const roundedRiskScore = Math.ceil(riskScore)
   const intentRanks: Record<number, keyof typeof intent> = {
     1: "rank_1",
@@ -39,7 +46,7 @@ export const LineItem = ({ city, country, summary, riskScore }: Props) => {
         </div>
         <p className="text-sm text-slate-900">{summary}</p>
       </div>
-      <Button Icon={ChevronRightIcon} />
+      <Button onClick={onButtonClick} Icon={ChevronRightIcon} />
     </div>
   )
 }
