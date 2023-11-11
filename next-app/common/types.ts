@@ -17,7 +17,10 @@ export type RiskStatus =
 
 export interface Factory {
   location: {
-    coordinates: [number, number]
+    coordinates: {
+      lon: number
+      lat: number
+    }
     city: string
     country: string
   }
