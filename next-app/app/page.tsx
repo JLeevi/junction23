@@ -1,16 +1,14 @@
 "use client"
 
-import createGlobe from "cobe"
+import mapboxgl from "mapbox-gl"
 import { useEffect, useRef, useState } from "react"
 
 import type { Factory, ServerResponse } from "@/common/types"
 import { Card } from "@/components/Card"
 import Header from "@/components/Header"
-import { LineData, LineItem } from "@/components/LineItem"
-import { NewsFeed } from "@/components/NewsFeed"
+import { LineItem } from "@/components/LineItem"
 import { Summary } from "@/components/Summary"
 import { factories } from "@/data/data"
-import { animated, useSpring } from "@react-spring/web"
 
 export default function Home() {
   const getSummaries = async (): Promise<ServerResponse> => {
@@ -23,56 +21,6 @@ export default function Home() {
     const json = (await response.json()) as ServerResponse
     return json
   }
-
-  const canvasRef = useRef()
-
-  const lineData: LineData[] = factories.map((factory) => {
-    return {
-      city: factory.location.city,
-      country: factory.location.country,
-      summary: factory.risk_status.has_risk
-        ? factory.risk_status.risk_summary
-        : "Status stable",
-      riskStatus: factory.risk_status.has_risk ? "high" : "low",
-    }
-  })
-
-  interface Location {
-    city: string
-    latitude: number
-    longitude: number
-  }
-
-  const locations: Location[] = [
-    {
-      city: "San Francisco",
-      latitude: 37.78,
-      longitude: -122.412,
-    },
-    {
-      city: "Berlin",
-      latitude: 52.52,
-      longitude: 13.405,
-    },
-    {
-      city: "Tokyo",
-      latitude: 35.676,
-      longitude: 139.65,
-    },
-    {
-      city: "Buenos Aires",
-      latitude: -34.6,
-      longitude: -58.38,
-    },
-  ]
-  const locationToAngles = (latitude: number, longitude: number) => {
-    return [
-      Math.PI - ((longitude * Math.PI) / 180 - Math.PI / 2),
-      (latitude * Math.PI) / 180,
-    ]
-  }
-  const focusRef = useRef([0, 0])
-  const [isRotating, setRotating] = useState(true)
 
   type State =
     | {
@@ -89,144 +37,131 @@ export default function Home() {
       }
 
   const [state, setState] = useState<State>({ type: "default", factories })
-  const newsFeedSpring = useSpring({
-    opacity: state.type === "default" ? 1 : 0,
-    height: state.type === "default" ? "auto" : 0,
-  })
+
+  // const [map, setMap] = useState<mapboxgl.Map>()
+  const mapboxID = "mapbox-globe"
+
+  let rotateInterval: NodeJS.Timeout
+
+  const mapContainer = useRef(null)
+  const map = useRef<mapboxgl.Map>(null)
+  const defaultLongitude = -70.9
+  const defaultLatitude = 42
+  const defaultZoom = 1
+  const [lon, setLng] = useState(defaultLongitude)
+  const [lat, setLat] = useState(defaultLatitude)
+  const [zoom, setZoom] = useState(defaultZoom)
+
+  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+  const goToLocation = (
+    latitude: number,
+    longitude: number,
+    zoom: number = defaultZoom,
+  ) => {
+    map.current.flyTo({
+      center: [longitude, latitude],
+      essential: true, // this animation is considered essential with respect to prefers-reduced-motion
+      speed: 3, // make the flying slow
+      curve: 1, // change the speed at which it zooms out
+      zoom: zoom,
+    })
+  }
+
+  // Mapbox initialization code
 
   useEffect(() => {
-    let width = 0
-    let currentPhi = 0
-    let currentTheta = 0
-    const doublePi = Math.PI * 2
-    const onResize = () =>
-      canvasRef.current && (width = canvasRef.current.offsetWidth)
-    window.addEventListener("resize", onResize)
-    onResize()
-
-    const globe = createGlobe(canvasRef.current, {
-      phi: 0,
-      theta: 0,
-      mapSamples: 16000,
-      mapBrightness: 6.5,
-      mapBaseBrightness: 0.0,
-      diffuse: 1.2,
-      dark: 0,
-      baseColor: [1, 1, 1],
-      markerColor: [1, 0, 0],
-      markers: locations.map(({ latitude, longitude }) => ({
-        location: [latitude, longitude],
-        size: 0.05,
-      })),
-      scale: 1,
-      opacity: 0.85,
-      glowColor: [0.7, 0.7, 0.7],
-      devicePixelRatio: 2,
-      width: 600 * 2,
-      height: 600 * 2,
-      onRender: (state) => {
-        if (isRotating) {
-          state.phi = currentPhi
-          currentPhi += 0.001
-        } else {
-          state.phi = currentPhi
-          state.theta = currentTheta
-          const [focusPhi, focusTheta] = focusRef.current
-          const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
-          const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
-          // Control the speed
-          if (distPositive < distNegative) {
-            currentPhi += distPositive * 0.08
-          } else {
-            currentPhi -= distNegative * 0.08
-          }
-          currentTheta = currentTheta * 0.92 + focusTheta * 0.08
-          state.width = width * 2
-          state.height = width * 2
-        }
+    if (map.current) return // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapboxID,
+      style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
+      center: [lon, lat],
+      zoom: zoom,
+      projection: {
+        name: "globe",
       },
     })
 
-    return () => globe.destroy()
-  }, [isRotating])
+    for (const factory of factories) {
+      // create a HTML element for each feature
+      const el = document.createElement("div")
+      el.className = "marker"
+
+      // make a marker for each feature and add to the map
+      new mapboxgl.Marker({
+        color: factory.risk_status.has_risk ? "#F87171" : "#34D399",
+      })
+        .setLngLat([
+          factory.location.coordinates.lon,
+          factory.location.coordinates.lat,
+        ])
+        .addTo(map.current)
+    }
+  }, [])
 
   return (
-    <main className="w-full">
+    <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
       <Header />
-      <div className="flex flex-col gap-8">
-        {/* <animated.div style={newsFeedSpring}>
-          <NewsFeed cardData={cardData} />
-        </animated.div> */}
-        <div className="grid grid-cols-2">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-            <Card>
-              <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-                {state.type != "factoryDetails" ? (
-                  state.factories.map((data, i) => (
-                    <LineItem
-                      {...data}
-                      key={crypto.randomUUID()}
-                      country={data.location.country}
-                      city={data.location.city}
-                      summary={
-                        data.risk_status.has_risk
-                          ? data.risk_status.risk_summary
-                          : "Status stable"
-                      }
-                      riskStatus={data.risk_status.has_risk ? "high" : "low"}
-                      onButtonClick={() => {
-                        setState({
-                          type: "loading",
-                          factories: state.factories,
-                        })
-                        setState({
-                          type: "factoryDetails",
-                          factory: factories[i],
-                        })
-                      }}
-                    />
-                  ))
-                ) : (
-                  <Summary
-                    city={state.factory.location.city}
-                    country={state.factory.location.country}
-                    riskStatus={state.factory.risk_status}
-                    articles={[]}
-                    onBackButtonClick={() =>
-                      setState({ type: "default", factories })
+      <div className="grid h-full grid-cols-2 gap-4">
+        <div className="flex h-full flex-col justify-center gap-4 ">
+          <h2 className="text-xl font-semibold">Realtime monitoring</h2>
+          <Card>
+            <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
+              {state.type != "factoryDetails" ? (
+                state.factories.map((data, i) => (
+                  <LineItem
+                    {...data}
+                    key={crypto.randomUUID()}
+                    country={data.location.country}
+                    city={data.location.city}
+                    summary={
+                      data.risk_status.has_risk
+                        ? data.risk_status.risk_summary
+                        : "Status stable"
                     }
+                    riskStatus={data.risk_status.has_risk ? "high" : "low"}
+                    onButtonClick={() => {
+                      setState({
+                        type: "loading",
+                        factories: state.factories,
+                      })
+                      goToLocation(
+                        data.location.coordinates.lat,
+                        data.location.coordinates.lon,
+                        9,
+                      )
+                      setState({
+                        type: "factoryDetails",
+                        factory: factories[i],
+                      })
+                    }}
                   />
-                )}
-              </div>
-            </Card>
-          </div>
-          <canvas
-            ref={canvasRef}
-            style={{
-              width: 600,
-              height: 600,
-              maxWidth: "100%",
-              aspectRatio: 1,
-            }}
-          />
+                ))
+              ) : (
+                <Summary
+                  city={state.factory.location.city}
+                  country={state.factory.location.country}
+                  riskStatus={state.factory.risk_status}
+                  articles={[]}
+                  onBackButtonClick={() => {
+                    setState({ type: "default", factories })
+                    goToLocation(
+                      state.factory.location.coordinates.lat,
+                      state.factory.location.coordinates.lon,
+                      defaultZoom,
+                    )
+                  }}
+                />
+              )}
+            </div>
+          </Card>
+        </div>
+        <div className="flex flex-col justify-center">
           <div
-            className="control-buttons flex flex-col items-center justify-center md:flex-row"
-            style={{ gap: ".5rem" }}
-          >
-            Rotate to:
-            {locations.map(({ city, latitude, longitude }) => (
-              <button
-                key={crypto.randomUUID()}
-                onClick={() => {
-                  focusRef.current = locationToAngles(latitude, longitude)
-                  setRotating(false)
-                }}
-              >
-                📍 {city}
-              </button>
-            ))}
-          </div>
+            ref={mapContainer}
+            className="flex aspect-square w-full flex-col"
+            id={mapboxID}
+          ></div>
         </div>
       </div>
     </main>

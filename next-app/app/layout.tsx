@@ -1,5 +1,7 @@
+import "mapbox-gl/dist/mapbox-gl.css"
 import type { Metadata } from "next"
 import { Inter as FontSans } from "next/font/google"
+import Head from "next/head"
 
 import { cn } from "@/lib/utils"
 
@@ -21,15 +23,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body
-        className={cn(
-          "mx-auto min-h-screen max-w-7xl bg-background bg-slate-50 px-16 font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
-        {children}
-      </body>
-    </html>
+    <>
+      <Head>
+        <link
+          href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css"
+          rel="stylesheet"
+        />
+      </Head>
+      <html lang="en">
+        <body
+          className={cn(
+            "mx-auto h-screen max-w-7xl bg-slate-50 px-16 font-sans antialiased",
+            fontSans.variable,
+          )}
+        >
+          {children}
+        </body>
+      </html>
+    </>
   )
 }
