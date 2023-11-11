@@ -2,7 +2,7 @@
 
 import createGlobe from "cobe"
 import { Factory } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { type CardData } from "@/components/Card"
 import Header from "@/components/Header"
@@ -11,43 +11,6 @@ import { NewsFeed } from "@/components/NewsFeed"
 
 export default function Home() {
   const canvasRef = useRef()
-
-  useEffect(() => {
-    let phi = 0
-
-    const globe = createGlobe(canvasRef.current, {
-      phi: 0,
-      theta: 0,
-      mapSamples: 16000,
-      mapBrightness: 6.5,
-      mapBaseBrightness: 0.0,
-      diffuse: 1.2,
-      dark: 0,
-      baseColor: [1, 1, 1],
-      markerColor: [0.1, 0.8, 1],
-      markers: [
-        // longitude latitude
-        { location: [37.7595, -122.4367], size: 0.03 },
-        { location: [40.7128, -74.006], size: 0.1 },
-      ],
-      scale: 1,
-      opacity: 0.85,
-      glowColor: [0.7, 0.7, 0.7],
-      devicePixelRatio: 2,
-      width: 600 * 2,
-      height: 600 * 2,
-      onRender: (state) => {
-        // Called on every animation frame.
-        // `state` will be an empty object, return updated params.
-        state.phi = phi
-        phi += 0.001
-      },
-    })
-
-    return () => {
-      globe.destroy()
-    }
-  }, [])
 
   const cardData: CardData[] = [
     {
@@ -125,6 +88,99 @@ export default function Home() {
     },
   ]
 
+  interface Location {
+    city: string
+    latitude: number
+    longitude: number
+  }
+
+  const locations: Location[] = [
+    {
+      city: "San Francisco",
+      latitude: 37.78,
+      longitude: -122.412,
+    },
+    {
+      city: "Berlin",
+      latitude: 52.52,
+      longitude: 13.405,
+    },
+    {
+      city: "Tokyo",
+      latitude: 35.676,
+      longitude: 139.65,
+    },
+    {
+      city: "Buenos Aires",
+      latitude: -34.6,
+      longitude: -58.38,
+    },
+  ]
+  const locationToAngles = (latitude: number, longitude: number) => {
+    return [
+      Math.PI - ((longitude * Math.PI) / 180 - Math.PI / 2),
+      (latitude * Math.PI) / 180,
+    ]
+  }
+  const focusRef = useRef([0, 0])
+  const [isRotating, setRotating] = useState(true)
+
+  useEffect(() => {
+    let width = 0
+    let currentPhi = 0
+    let currentTheta = 0
+    const doublePi = Math.PI * 2
+    const onResize = () =>
+      canvasRef.current && (width = canvasRef.current.offsetWidth)
+    window.addEventListener("resize", onResize)
+    onResize()
+
+    const globe = createGlobe(canvasRef.current, {
+      phi: 0,
+      theta: 0,
+      mapSamples: 16000,
+      mapBrightness: 6.5,
+      mapBaseBrightness: 0.0,
+      diffuse: 1.2,
+      dark: 0,
+      baseColor: [1, 1, 1],
+      markerColor: [1, 0, 0],
+      markers: locations.map(({ latitude, longitude }) => ({
+        location: [latitude, longitude],
+        size: 0.05,
+      })),
+      scale: 1,
+      opacity: 0.85,
+      glowColor: [0.7, 0.7, 0.7],
+      devicePixelRatio: 2,
+      width: 600 * 2,
+      height: 600 * 2,
+      onRender: (state) => {
+        if (isRotating) {
+          state.phi = currentPhi
+          currentPhi += 0.001
+        } else {
+          state.phi = currentPhi
+          state.theta = currentTheta
+          const [focusPhi, focusTheta] = focusRef.current
+          const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
+          const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
+          // Control the speed
+          if (distPositive < distNegative) {
+            currentPhi += distPositive * 0.08
+          } else {
+            currentPhi -= distNegative * 0.08
+          }
+          currentTheta = currentTheta * 0.92 + focusTheta * 0.08
+          state.width = width * 2
+          state.height = width * 2
+        }
+      },
+    })
+
+    return () => globe.destroy()
+  }, [isRotating])
+
   return (
     <main className="w-full">
       <Header />
@@ -148,6 +204,22 @@ export default function Home() {
               aspectRatio: 1,
             }}
           />
+          <div
+            className="control-buttons flex flex-col items-center justify-center md:flex-row"
+            style={{ gap: ".5rem" }}
+          >
+            Rotate to:
+            {locations.map(({ city, latitude, longitude }) => (
+              <button
+                onClick={() => {
+                  focusRef.current = locationToAngles(latitude, longitude)
+                  setRotating(false)
+                }}
+              >
+                📍 {city}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </main>
