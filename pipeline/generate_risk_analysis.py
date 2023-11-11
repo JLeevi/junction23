@@ -24,7 +24,7 @@ def get_completion_for_location(location, articles):
         tools=prompts["tools"],
         tool_choice=prompts["tool_choice"],
         model=MODEL_ID,
-        max_tokens=500,
+        max_tokens=750,
         temperature=0.3
     )
     return completion
