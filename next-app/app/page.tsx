@@ -20,20 +20,31 @@ export default function Home() {
       }
   const [state, setState] = useState<State>({ type: "loading" })
   const [chosenFactory, setChosenFactory] = useState<Factory | null>(null)
+  const pollInterval = 10000
+
+  const getSummaries = async () => {
+    const response = await fetch("/api/summary", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    const json = (await response.json()) as ServerResponse
+    console.log("JSON RESPONSE", json)
+    setState({ type: "allFactories", factories: json })
+  }
 
   useEffect(() => {
-    const getSummaries = async () => {
-      const response = await fetch("/api/summary", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      const json = (await response.json()) as ServerResponse
-      console.log("JSON RESPONSE", json)
-      setState({ type: "allFactories", factories: json })
-    }
+    // Fetch data initially
     getSummaries()
+
+    // Set up the interval to poll every x seconds
+    const intervalId = setInterval(() => {
+      getSummaries()
+    }, pollInterval)
+
+    // Clean up the interval when the component is unmounted
+    return () => clearInterval(intervalId)
   }, [])
 
   // const [map, setMap] = useState<mapboxgl.Map>()
