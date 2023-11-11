@@ -3,3 +3,5 @@ venv
 poetry.lock
 data
 *.json
+__pycache__/
+
