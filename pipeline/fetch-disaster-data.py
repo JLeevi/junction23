@@ -13,7 +13,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     coords2 = (lat2, lon2)
     return geodesic(coords1, coords2).kilometers
 
-def parse_xml(content_xml, locations):
+def parse_xml(content_xml, locations, url):
     root = ET.fromstring(content_xml)
     result_data = {"alert_data": []}
     for item in root.findall('.//item'):
@@ -39,7 +39,8 @@ def parse_xml(content_xml, locations):
             "calculation_type": calculation_type,
             "severity_level": severity_level,
             "country": country,
-            "locations_affected": []
+            "locations_affected": [],
+            "source": url
         }
 
         for location in locations:
@@ -66,7 +67,7 @@ def main():
     url = "https://www.gdacs.org/xml/rss.xml"
     response = requests.get(url)
     content_xml = response.content.decode("utf-8")
-    result_data = parse_xml(content_xml, locations)
+    result_data = parse_xml(content_xml, locations, url)
 
     with open("data.json", 'w') as json_file:
         json.dump(result_data, json_file)
