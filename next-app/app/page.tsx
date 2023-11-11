@@ -144,10 +144,10 @@ export default function Home() {
       diffuse: 1.2,
       dark: 0,
       baseColor: [1, 1, 1],
-      markerColor: [0.1, 0.8, 1],
+      markerColor: [1, 0, 0],
       markers: locations.map(({ latitude, longitude }) => ({
         location: [latitude, longitude],
-        size: 0.1,
+        size: 0.05,
       })),
       scale: 1,
       opacity: 0.85,
