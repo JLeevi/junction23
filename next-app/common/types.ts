@@ -27,6 +27,4 @@ export interface Factory {
   risk_status: RiskStatus
 }
 
-export interface ServerResponse {
-  factories: Factory[]
-}
+export type ServerResponse = Factory[]

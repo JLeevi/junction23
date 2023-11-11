@@ -8,35 +8,33 @@ import { Card } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineItem } from "@/components/LineItem"
 import { Summary } from "@/components/Summary"
-import { factories } from "@/data/data"
 
 export default function Home() {
-  const getSummaries = async (): Promise<ServerResponse> => {
-    const response = await fetch("/api/summary", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    const json = (await response.json()) as ServerResponse
-    return json
-  }
-
   type State =
     | {
-        type: "default"
-        factories: Factory[]
-      }
-    | {
         type: "loading"
-        factories: Factory[]
       }
     | {
-        type: "factoryDetails"
-        factory: Factory
+        type: "allFactories"
+        factories: Factory[]
       }
+  const [state, setState] = useState<State>({ type: "loading" })
+  const [chosenFactory, setChosenFactory] = useState<Factory | null>(null)
 
-  const [state, setState] = useState<State>({ type: "default", factories })
+  useEffect(() => {
+    const getSummaries = async () => {
+      const response = await fetch("/api/summary", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const json = (await response.json()) as ServerResponse
+      console.log("JSON RESPONSE", json)
+      setState({ type: "allFactories", factories: json })
+    }
+    getSummaries()
+  }, [])
 
   // const [map, setMap] = useState<mapboxgl.Map>()
   const mapboxID = "mapbox-globe"
@@ -72,6 +70,8 @@ export default function Home() {
 
   useEffect(() => {
     if (map.current) return // initialize map only once
+    if (state.type !== "allFactories") return
+
     map.current = new mapboxgl.Map({
       container: mapboxID,
       style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
@@ -81,8 +81,7 @@ export default function Home() {
         name: "globe",
       },
     })
-
-    for (const factory of factories) {
+    for (const factory of state.factories) {
       // create a HTML element for each feature
       const el = document.createElement("div")
       el.className = "marker"
@@ -97,7 +96,7 @@ export default function Home() {
         ])
         .addTo(map.current)
     }
-  }, [])
+  }, [state.type])
 
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
@@ -107,7 +106,7 @@ export default function Home() {
           <h2 className="text-xl font-semibold">Realtime monitoring</h2>
           <Card>
             <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-              {state.type != "factoryDetails" ? (
+              {state.type === "allFactories" && !chosenFactory ? (
                 state.factories.map((data, i) => (
                   <LineItem
                     {...data}
@@ -121,38 +120,31 @@ export default function Home() {
                     }
                     riskStatus={data.risk_status.has_risk ? "high" : "low"}
                     onButtonClick={() => {
-                      setState({
-                        type: "loading",
-                        factories: state.factories,
-                      })
+                      setChosenFactory(state.factories[i])
                       goToLocation(
                         data.location.coordinates.lat,
                         data.location.coordinates.lon,
                         9,
                       )
-                      setState({
-                        type: "factoryDetails",
-                        factory: factories[i],
-                      })
                     }}
                   />
                 ))
-              ) : (
+              ) : state.type === "allFactories" && chosenFactory ? (
                 <Summary
-                  city={state.factory.location.city}
-                  country={state.factory.location.country}
-                  riskStatus={state.factory.risk_status}
+                  city={chosenFactory.location.city}
+                  country={chosenFactory.location.country}
+                  riskStatus={chosenFactory.risk_status}
                   articles={[]}
                   onBackButtonClick={() => {
-                    setState({ type: "default", factories })
+                    setChosenFactory(null)
                     goToLocation(
-                      state.factory.location.coordinates.lat,
-                      state.factory.location.coordinates.lon,
+                      chosenFactory.location.coordinates.lat,
+                      chosenFactory.location.coordinates.lon,
                       defaultZoom,
                     )
                   }}
                 />
-              )}
+              ) : null}
             </div>
           </Card>
         </div>

@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // Define your Azure Blob fetch function here (or import it if it's defined elsewhere)
 
-    const data = await fetchDataFromBlobStorage("web-input", "test_data.json")
+    const data = await fetchDataFromBlobStorage("web-input", "risk_status.json")
 
     // Return the fetched data as JSON
     return new Response(JSON.stringify(data), {
