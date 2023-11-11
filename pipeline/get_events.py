@@ -14,9 +14,11 @@ def main():
     all_events = disaster_articles + news_articles
     with open("data/events.json", "w") as json_file:
         json.dump(all_events, json_file, indent=4)
-    
-    blob_service_client = BlobServiceClient.from_connection_string(connection_string)
-    blob_client = blob_service_client.get_blob_client(container="llm-input", blob=f"events.json")
+
+    blob_service_client = BlobServiceClient.from_connection_string(
+        connection_string)
+    blob_client = blob_service_client.get_blob_client(
+        container="llm-input", blob=f"events.json")
     with open(file="data/events.json", mode="rb") as data:
         blob_client.upload_blob(data, overwrite=True)
 
