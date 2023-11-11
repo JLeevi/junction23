@@ -76,8 +76,6 @@ export default function Home() {
     // Rotate at intermediate speeds between zoom levels 3 and 5.
     const slowSpinZoom = 3
 
-    console.log("Longitude", globe.getCenter().lng)
-
     const zoom = globe.getZoom()
     if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
       let distancePerSecond = 360 / secondsPerRevolution
@@ -93,17 +91,6 @@ export default function Home() {
       // When this animation is complete, it calls a 'moveend' event.
       globe.easeTo({ center, duration: 1000, easing: (n) => n })
     }
-  }
-
-  function startSpinning(globe: mapboxgl.Map) {
-    if (userInteracting) return
-    if (rotateInterval) clearInterval(rotateInterval)
-
-    rotateInterval = setInterval(() => {
-      if (!userInteracting && spinEnabled) {
-        spinGlobe(globe)
-      }
-    }, 1000) // Adjust the interval as needed
   }
 
   useEffect(() => {
@@ -146,24 +133,27 @@ export default function Home() {
     // Pause spinning on interaction
     current.on("mousedown", () => {
       setUserInteracting(true)
-      if (rotateInterval) clearInterval(rotateInterval)
     })
 
     // Restart spinning the globe when interaction is complete
     current.on("mouseup", () => {
       setUserInteracting(false)
+      spinGlobe(current)
     })
 
     // These events account for cases where the mouse has moved
     // off the map, so 'mouseup' will not be fired.
     current.on("dragend", () => {
       setUserInteracting(false)
+      spinGlobe(current)
     })
     current.on("pitchend", () => {
       setUserInteracting(false)
+      spinGlobe(current)
     })
     current.on("rotateend", () => {
       setUserInteracting(false)
+      spinGlobe(current)
     })
 
     // When animation is complete, start spinning if there is no ongoing interaction
@@ -175,17 +165,17 @@ export default function Home() {
   const [userInteracting, setUserInteracting] = useState(false)
   const [spinEnabled, setSpinEnabled] = useState(true)
 
-  useEffect(() => {
-    if (!map.current) return
-    const current = map.current
-    if (userInteracting) {
-      current.stop()
-    } else if (!spinEnabled) {
-      current.stop()
-    } else {
-      spinGlobe(current)
-    }
-  }, [userInteracting, spinEnabled, map.current])
+  // useEffect(() => {
+  //   if (!map.current) return
+  //   const current = map.current
+  //   if (userInteracting) {
+  //     current.stop()
+  //   } else if (!spinEnabled) {
+  //     current.stop()
+  //   } else {
+  //     spinGlobe(current)
+  //   }
+  // }, [userInteracting, spinEnabled, map.current])
 
   return (
     <main className="grid h-full w-full grid-rows-[auto_minmax(0,_1fr)] ">
