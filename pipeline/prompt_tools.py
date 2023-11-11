@@ -41,7 +41,7 @@ def get_tool_for_location(location):
             "type": "function",
             "function": {
                 "name": "report_risk_status",
-                "description": f"Report the risk status for {location_name} based on the news articles",
+                "description": f"Report the risk status for {location_name} based on the news articles. Use double quotes for all strings.",
                 "parameters": {
                     "type": "object",
                     "properties": {
@@ -59,7 +59,7 @@ def get_tool_for_location(location):
                         },
                         "articles": {
                             "type": "array",
-                            "description": "The articles related to the risk. Empty if there is no risk.",
+                            "description": "The articles related to the risk. Empty array returned if has_risk is false.",
                             "items": {
                                 "type": "object",
                                 "properties": {
