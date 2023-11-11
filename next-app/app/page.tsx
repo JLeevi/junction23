@@ -4,6 +4,7 @@ import createGlobe from "cobe"
 import { Factory } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+import { Card } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineData, LineItem } from "@/components/LineItem"
 import { type NewsCardData } from "@/components/NewsCard"
@@ -189,11 +190,13 @@ export default function Home() {
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-            <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 bg-white px-6">
-              {lineData.map((props) => (
-                <LineItem key={crypto.randomUUID()} {...props} />
-              ))}
-            </div>
+            <Card>
+              <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
+                {lineData.map((props) => (
+                  <LineItem key={crypto.randomUUID()} {...props} />
+                ))}
+              </div>
+            </Card>
           </div>
           <canvas
             ref={canvasRef}
