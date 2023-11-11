@@ -4,9 +4,10 @@ import createGlobe from "cobe"
 import { Factory } from "lucide-react"
 import { useEffect, useRef } from "react"
 
-import { Card, type CardData } from "@/components/Card"
+import { type CardData } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineData, LineItem } from "@/components/LineItem"
+import { NewsFeed } from "@/components/NewsFeed"
 
 export default function Home() {
   const canvasRef = useRef()
@@ -128,11 +129,7 @@ export default function Home() {
     <main className="w-full">
       <Header />
       <div className="flex flex-col gap-8">
-        <div className="hidden-scrollbar flex w-full gap-4 overflow-x-auto py-4">
-          {cardData.map((props) => (
-            <Card {...props} />
-          ))}
-        </div>
+        <NewsFeed cardData={cardData} />
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
