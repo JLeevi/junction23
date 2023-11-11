@@ -116,7 +116,7 @@ export default function Home() {
                     city={data.location.city}
                     summary={
                       data.risk_status.has_risk
-                        ? data.risk_status.risk_summary
+                        ? data.risk_status.risk_title
                         : "Status stable"
                     }
                     riskStatus={data.risk_status.has_risk ? "high" : "low"}
