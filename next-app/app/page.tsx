@@ -37,6 +37,7 @@ export default function Home() {
       }
 
   const [state, setState] = useState<State>({ type: "default", factories })
+
   // const [map, setMap] = useState<mapboxgl.Map>()
   const mapboxID = "mapbox-globe"
 
@@ -47,9 +48,10 @@ export default function Home() {
   const defaultLongitude = -70.9
   const defaultLatitude = 42
   const defaultZoom = 1
-  const [lng, setLng] = useState(defaultLongitude)
+  const [lon, setLng] = useState(defaultLongitude)
   const [lat, setLat] = useState(defaultLatitude)
   const [zoom, setZoom] = useState(defaultZoom)
+
   mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
   const goToLocation = (
@@ -73,12 +75,26 @@ export default function Home() {
     map.current = new mapboxgl.Map({
       container: mapboxID,
       style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL,
-      center: [lng, lat],
+      center: [lon, lat],
       zoom: zoom,
       projection: {
         name: "globe",
       },
     })
+
+    for (const factory of factories) {
+      // create a HTML element for each feature
+      const el = document.createElement("div")
+      el.className = "marker"
+
+      // make a marker for each feature and add to the map
+      new mapboxgl.Marker()
+        .setLngLat([
+          factory.location.coordinates.lon,
+          factory.location.coordinates.lat,
+        ])
+        .addTo(map.current)
+    }
   }, [])
 
   return (
@@ -139,7 +155,8 @@ export default function Home() {
           </Card>
         </div>
         <div
-          className="flex h-full w-full flex-col items-center"
+          ref={mapContainer}
+          className="flex h-full w-full flex-col"
           id={mapboxID}
         ></div>
       </div>
