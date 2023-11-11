@@ -136,7 +136,7 @@ export default function Home() {
         <div className="grid grid-cols-2">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-            <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 px-6">
+            <div className="flex flex-col divide-y-[1px] divide-slate-300 rounded-md border border-slate-200 bg-white px-6">
               {lineData.map((props) => (
                 <LineItem {...props} />
               ))}

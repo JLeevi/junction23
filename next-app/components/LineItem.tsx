@@ -28,7 +28,7 @@ export const LineItem = ({ city, country, summary, riskScore }: Props) => {
   }
 
   return (
-    <div className="flex justify-between gap-4 py-4">
+    <div className="flex justify-between gap-4 py-6">
       <div className="flex flex-col gap-2 ">
         <div className="flex items-center gap-3">
           <h3 className="font-bold text-slate-900">
