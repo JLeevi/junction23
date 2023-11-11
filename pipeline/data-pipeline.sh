@@ -9,11 +9,11 @@ BLUE='\033[1;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}Fetching news and disaster events...${NC}"
-python get_events.py
+DEMO=${DEMO} python get_events.py
 echo -e "${GREEN}Done!${NC}"
 
 echo -e "${BLUE}Generating risk analysis...${NC}"
-python get_events.py
+python generate_risk_analysis.py
 echo -e "${GREEN}Done!${NC}"
 
 echo -e "${YELLOW}Pipeline completed${NC}"
