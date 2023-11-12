@@ -6,7 +6,10 @@ interface Props extends ComponentProps<"div"> {
 
 export const Card = ({ children, ...props }: Props) => {
   return (
-    <div {...props} className="rounded-md border border-slate-200 bg-white">
+    <div
+      {...props}
+      className="h-full rounded-md border border-slate-200 bg-white"
+    >
       {children}
     </div>
   )

@@ -386,8 +386,8 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <div className="grid h-full grid-cols-2 gap-4 pb-24">
-          <div className="flex h-full flex-col justify-center gap-4 ">
+        <div className="grid h-full grid-cols-2 gap-4 pb-24 pt-12">
+          <div className="flex h-full flex-col justify-center gap-4">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
             {!chosenFactory ? (
               <animated.div style={transitionList}>

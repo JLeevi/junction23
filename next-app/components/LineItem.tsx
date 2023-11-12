@@ -25,7 +25,7 @@ export const LineItem = ({
   const pillarColor = riskStatus === "high" ? "bg-red-600" : "bg-green-600"
 
   return (
-    <div className="flex items-center justify-between gap-2 py-6">
+    <div className="flex items-center justify-between gap-2 py-4">
       <div className="relative">
         <div
           className={`absolute left-0 h-full ${pillarColor} w-2 rounded-lg`}
