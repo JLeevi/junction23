@@ -41,7 +41,7 @@ def get_tool_for_location(location):
             "type": "function",
             "function": {
                 "name": "report_risk_status",
-                "description": f"Report the risk status for {location_name} based on the news articles. Use double quotes for all strings.",
+                "description": f"Report the risk status for {location_name} based on the news articles. Information regarding the articles (article title & url) is given in the article parameters, not in the summary.",
                 "parameters": {
                     "type": "object",
                     "properties": {
