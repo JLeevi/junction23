@@ -257,6 +257,20 @@ export default function Home() {
     setChosenFactory(newRisk)
   }
 
+  const callNotifyEndpoint = async (factory: Factory) => {
+    if (!factory.risk_status.has_risk) return
+    const body = {
+      eventDescription: factory.risk_status.risk_title,
+    }
+    await fetch("/api/alert", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+  }
+
   const getSummaries = async () => {
     const response = await fetch("/api/summary", {
       method: "GET",
@@ -283,7 +297,10 @@ export default function Home() {
     )
     if (!oldFactories) return
     const newRisk = tryGetNewRisk(oldFactories, newFactories)
-    if (newRisk) focusToNewRisk(newRisk)
+    if (newRisk) {
+      focusToNewRisk(newRisk)
+      callNotifyEndpoint(newRisk)
+    }
   }
 
   useEffect(() => {
