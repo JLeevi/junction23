@@ -84,3 +84,5 @@ async function streamToString(readableStream: ReadableStream) {
     readableStream.on("error", reject)
   })
 }
+
+export const fetchCache = "force-no-store"
