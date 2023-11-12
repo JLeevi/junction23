@@ -59,7 +59,7 @@ def get_tool_for_location(location):
                         },
                         "articles": {
                             "type": "array",
-                            "description": "Must be included, whenever has_risk is True. Contains information of the articles that describe the risk.",
+                            "description": "Given if there is a risk. Contains information of the articles that describe the risk. Very important to include if there is a risk.",
                             "items": {
                                 "type": "object",
                                 "properties": {
