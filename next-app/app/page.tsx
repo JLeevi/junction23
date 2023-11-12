@@ -244,15 +244,13 @@ export default function Home() {
 
   const transitionList = useSpring({
     opacity: chosenFactory ? 0 : 1, // You can customize the animation properties
-    transform: `scale(${chosenFactory ? 0 : 1})`, // Another example property
+    transform: `scale(${chosenFactory ? 0.7 : 1})`, // Another example property
     config: { tension: 170, friction: 20 }, // Example spring configuration
-    delay: chosenFactory ? 200 : 0, // Delay for a staggered effect
   })
   const transitionChosenFactory = useSpring({
     opacity: chosenFactory ? 1 : 0, // You can customize the animation properties
-    transform: `scale(${chosenFactory ? 1 : 0})`, // Another example property
+    transform: `scale(${chosenFactory ? 1 : 0.7})`, // Another example property
     config: { tension: 170, friction: 20 }, // Example spring configuration
-    delay: chosenFactory ? 0 : 200, // Delay for a staggered effect
   })
 
   const focusToNewRisk = (newRisk: Factory) => {
@@ -391,10 +389,10 @@ export default function Home() {
         <div className="grid h-full grid-cols-2 gap-4 pb-24">
           <div className="flex h-full flex-col justify-center gap-4 ">
             <h2 className="text-xl font-semibold">Realtime monitoring</h2>
-            <Card>
-              <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-                {!chosenFactory ? (
-                  <animated.div style={transitionList}>
+            {!chosenFactory ? (
+              <animated.div style={transitionList}>
+                <Card>
+                  <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
                     {factories.map((data, i) => (
                       <LineItem
                         {...data}
@@ -412,9 +410,13 @@ export default function Home() {
                         }}
                       />
                     ))}
-                  </animated.div>
-                ) : (
-                  <animated.div style={transitionChosenFactory}>
+                  </div>
+                </Card>
+              </animated.div>
+            ) : (
+              <animated.div style={transitionChosenFactory}>
+                <Card>
+                  <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
                     <Summary
                       city={chosenFactory.location.city}
                       country={chosenFactory.location.country}
@@ -433,10 +435,10 @@ export default function Home() {
                         )
                       }}
                     />
-                  </animated.div>
-                )}
-              </div>
-            </Card>
+                  </div>
+                </Card>
+              </animated.div>
+            )}
           </div>
           <div className="flex flex-col justify-center">
             <div
