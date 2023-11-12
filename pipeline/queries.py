@@ -20,21 +20,6 @@ NEWS_QUERIES = [
     },
     {
         "location": {
-            "flag": "🇬🇹",
-            "country": "Guatemala",
-            "city": "El Estor",
-            "coordinates": {
-                "lat": 15.5322197047923,
-                "lon": -89.33265507494376,
-            }
-        },
-        "events": [
-            "natural disaster",
-            "workers strike",
-        ],
-    },
-    {
-        "location": {
             "flag": "🇧🇷",
             "country": "Brazil",
             "city": "Onca Puma",
