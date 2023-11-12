@@ -8,6 +8,7 @@ import { Card } from "@/components/Card"
 import Header from "@/components/Header"
 import { LineItem } from "@/components/LineItem"
 import { Summary } from "@/components/Summary"
+import { animated, useSpring } from "@react-spring/web"
 
 const MOCK_WITHOUT_RISK: Factory[] = [
   {
@@ -241,6 +242,19 @@ export default function Home() {
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([])
   mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string
 
+  const transitionList = useSpring({
+    opacity: chosenFactory ? 0 : 1, // You can customize the animation properties
+    transform: `scale(${chosenFactory ? 0 : 1})`, // Another example property
+    config: { tension: 170, friction: 20 }, // Example spring configuration
+    delay: chosenFactory ? 200 : 0, // Delay for a staggered effect
+  })
+  const transitionChosenFactory = useSpring({
+    opacity: chosenFactory ? 1 : 0, // You can customize the animation properties
+    transform: `scale(${chosenFactory ? 1 : 0})`, // Another example property
+    config: { tension: 170, friction: 20 }, // Example spring configuration
+    delay: chosenFactory ? 0 : 200, // Delay for a staggered effect
+  })
+
   const focusToNewRisk = (newRisk: Factory) => {
     setChosenFactory(newRisk)
   }
@@ -380,42 +394,46 @@ export default function Home() {
             <Card>
               <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
                 {!chosenFactory ? (
-                  factories.map((data, i) => (
-                    <LineItem
-                      {...data}
-                      key={crypto.randomUUID()}
-                      country={data.location.country}
-                      city={data.location.city}
-                      summary={
-                        data.risk_status.has_risk
-                          ? data.risk_status.risk_title
-                          : "Status stable"
+                  <animated.div style={transitionList}>
+                    {factories.map((data, i) => (
+                      <LineItem
+                        {...data}
+                        key={crypto.randomUUID()}
+                        country={data.location.country}
+                        city={data.location.city}
+                        summary={
+                          data.risk_status.has_risk
+                            ? data.risk_status.risk_title
+                            : "Status stable"
+                        }
+                        riskStatus={data.risk_status.has_risk ? "high" : "low"}
+                        onButtonClick={() => {
+                          setChosenFactory(factories[i])
+                        }}
+                      />
+                    ))}
+                  </animated.div>
+                ) : (
+                  <animated.div style={transitionChosenFactory}>
+                    <Summary
+                      city={chosenFactory.location.city}
+                      country={chosenFactory.location.country}
+                      riskStatus={chosenFactory.risk_status}
+                      articles={
+                        chosenFactory.risk_status.has_risk
+                          ? chosenFactory.risk_status.articles
+                          : []
                       }
-                      riskStatus={data.risk_status.has_risk ? "high" : "low"}
-                      onButtonClick={() => {
-                        setChosenFactory(factories[i])
+                      onBackButtonClick={() => {
+                        setChosenFactory(null)
+                        goToLocation(
+                          defaultLatitude,
+                          defaultLongitude,
+                          defaultZoom,
+                        )
                       }}
                     />
-                  ))
-                ) : (
-                  <Summary
-                    city={chosenFactory.location.city}
-                    country={chosenFactory.location.country}
-                    riskStatus={chosenFactory.risk_status}
-                    articles={
-                      chosenFactory.risk_status.has_risk
-                        ? chosenFactory.risk_status.articles
-                        : []
-                    }
-                    onBackButtonClick={() => {
-                      setChosenFactory(null)
-                      goToLocation(
-                        defaultLatitude,
-                        defaultLongitude,
-                        defaultZoom,
-                      )
-                    }}
-                  />
+                  </animated.div>
                 )}
               </div>
             </Card>
