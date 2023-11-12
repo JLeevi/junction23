@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error as any).message }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",
@@ -53,22 +53,32 @@ async function fetchDataFromBlobStorage(
   const downloadBlockBlobResponse = await blobClient.download(0)
 
   // Assuming the blob's content is text, not binary
+  if (!downloadBlockBlobResponse.readableStreamBody) {
+    throw new Error("No readableStreamBody")
+  }
+
   const downloaded = await streamToString(
-    downloadBlockBlobResponse.readableStreamBody,
+    downloadBlockBlobResponse.readableStreamBody as any,
   )
-  return JSON.parse(downloaded)
+  return JSON.parse(downloaded as any)
 }
 
 // A helper function used to read a ReadableStream into a string
-async function streamToString(readableStream: Readable) {
+async function streamToString(readableStream: ReadableStream) {
   return new Promise((resolve, reject) => {
     const chunks: string[] = []
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     readableStream.on("data", (data) => {
       chunks.push(data.toString())
     })
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     readableStream.on("end", () => {
       resolve(chunks.join(""))
     })
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     readableStream.on("error", reject)
   })
 }
