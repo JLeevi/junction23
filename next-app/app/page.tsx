@@ -405,32 +405,36 @@ export default function Home() {
       ) : (
         <div className="grid h-full grid-cols-2 gap-4 pb-24 pt-12">
           <div className="flex h-full flex-col justify-center gap-4">
-            <h2 className="text-xl font-semibold">Realtime monitoring</h2>
             {!chosenFactory ? (
-              <animated.div style={transitionList}>
-                <Card>
-                  <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
-                    {factories.map((data, i) => (
-                      <LineItem
-                        {...data}
-                        key={crypto.randomUUID()}
-                        flag={data.location.flag}
-                        country={data.location.country}
-                        city={data.location.city}
-                        summary={
-                          data.risk_status.has_risk
-                            ? data.risk_status.risk_title
-                            : "Status stable"
-                        }
-                        riskStatus={data.risk_status.has_risk ? "high" : "low"}
-                        onButtonClick={() => {
-                          setChosenFactory(factories[i])
-                        }}
-                      />
-                    ))}
-                  </div>
-                </Card>
-              </animated.div>
+              <>
+                <h2 className="text-xl font-semibold">Realtime monitoring</h2>
+                <animated.div style={transitionList}>
+                  <Card>
+                    <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
+                      {factories.map((data, i) => (
+                        <LineItem
+                          {...data}
+                          key={crypto.randomUUID()}
+                          flag={data.location.flag}
+                          country={data.location.country}
+                          city={data.location.city}
+                          summary={
+                            data.risk_status.has_risk
+                              ? data.risk_status.risk_title
+                              : "Status stable"
+                          }
+                          riskStatus={
+                            data.risk_status.has_risk ? "high" : "low"
+                          }
+                          onButtonClick={() => {
+                            setChosenFactory(factories[i])
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </Card>
+                </animated.div>
+              </>
             ) : (
               <animated.div style={transitionChosenFactory}>
                 <Card>
