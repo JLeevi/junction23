@@ -12,7 +12,7 @@ interface Props extends ComponentProps<"div"> {
   city: string
   country: string
   riskStatus: RiskStatus
-  articles: Article[]
+  articles?: Article[]
   onBackButtonClick: () => void
 }
 
@@ -50,7 +50,7 @@ export const Summary = ({
           <p className="text-base font-normal">{riskStatus.risk_summary}</p>
         </div>
       )}
-      {articles.length > 0 && (
+      {articles && articles.length > 0 && (
         <div className="flex flex-col gap-2">
           <>
             <h4 className="text-base font-bold">Sources</h4>
