@@ -234,7 +234,7 @@ export default function Home() {
   const defaultZoom = 1.3
   const [factories, setFactories] = useState<Factory[]>([])
   const [chosenFactory, setChosenFactory] = useState<Factory | null>(null)
-  const pollInterval = 1000
+  const pollInterval = 7000
 
   const mapboxID = "mapbox-globe"
   const mapContainer = useRef(null)
