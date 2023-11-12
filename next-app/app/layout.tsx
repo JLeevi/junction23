@@ -13,7 +13,7 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
-  title: "Supply Signal",
+  title: "SupplySignal",
   description: "Ensure a steady flow of supplies to your factory",
 }
 
