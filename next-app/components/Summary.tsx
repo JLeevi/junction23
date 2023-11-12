@@ -56,7 +56,6 @@ export const Summary = ({
               return (
                 <NewsCard
                   key={article.content}
-                  author={article.author}
                   summary={article.title}
                   url={article.url}
                 />
