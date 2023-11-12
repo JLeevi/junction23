@@ -6,46 +6,47 @@
 
 ## Overview
 
-Welcome to SupplySignal, your go-to solution for efficiently monitoring and managing supply chain risks. In today's complex global landscape, disruptions in the supply chain can have far-reaching consequences. SupplySignal is here to keep you one step ahead by automatically fetching and analyzing relevant information from various news feeds and disaster watch sources.
+Welcome to SupplySignal, your solution for proactive supply chain risk management. In today's intricate global business landscape, disruptions in the operations of even a single supplier can bring an entire production line to a standstill. SupplySignal empowers companies by providing continuous, timely, and relevant information on major events affecting raw material suppliers, enabling proactive adjustments to sourcing operations in the face of high risks.
 
 ## Problem Statement
 
-In the face of intricate supply chains, a hiccup in the operations of even one supplier can grind a company's production to a halt. Traditional methods of monitoring involve sifting through multiple news feeds, a time-consuming process that often leads to delayed responses. SupplySignal addresses this challenge by automating the data collection, filtering, and analysis process, providing users with timely insights to adjust their sourcing operations effectively.
+In the traditional approach, staying informed about supplier-related events involves manual scrutiny of multiple global news feeds and data sources, a time-consuming process prone to delayed responses. SupplySignal tackles this challenge head-on by automating data retrieval, filtering pertinent information based on supplier locations and topics, employing a Language Model (LLM) for analysis, and presenting users with concise risk descriptions. Accessible through a user-friendly monitoring dashboard, SupplySignal ensures timely insights to optimize sourcing strategies.
 
-## Features
+Check out a demo of the SupplySignal monitoring dashboard [here](https://junction23-beige.vercel.app).
 
-### 1. Automated Information Retrieval
+## Three Pillars of Development
 
-SupplySignal fetches data from diverse news feeds and disaster watch sources, ensuring a comprehensive view of potential risks.
+### 1. Trustworthiness of Results
 
-### 2. Location and Topic-Based Filtering
+To guarantee the reliability of results, we implement rigorous measures:
 
-Efficiently narrow down the information overload by selectively querying based on supplier locations and predefined keywords, reducing the search space. We can utilize domain knowledge of the key risks for each site to effectively monitor what matters the most.
+- **Location and Topic-Wise Queries:** Results are sanitized through selective queries, focusing on supplier locations and predefined keywords. We can leverage domain knowledge to scan for risks in specific locations.
+  
+- **Augmented Information:** News articles are enriched with up-to-date global disaster information curated by reputable organizations like the United Nations and the European Union.
+  
+- **Source Transparency:** Claims made by the AI are backed by verifiable sources, ensuring trustworthiness. All conclusions are complemented by either news articles or GDACS reports.
+  
+- **Prompt Design:** The LLM utilizes a predefined and tested prompt to avoid hallucinations.
 
-### 3. Trustworthy Results
+### 2. Efficiency of the Solution
 
-To ensure reliability, all conclusions are backed by transparent sources, including news articles and reports from reputable organizations like the United Nations and the European Union.
+SupplySignal excels in efficiency, outperforming traditional methods:
 
-### 4. Monitoring Dashboard
-
-Access SupplySignal through an intuitive web-based monitoring dashboard, providing a user-friendly interface for staying informed.
-
-### 5. Modular Architecture
-
-The highly modular architecture allows for easy integration and future-proofing. Swap out the underlying Language Model (LLM) without disrupting the rest of the data pipeline.
-
-## Trustworthiness
-
-SupplySignal prioritizes the quality of information, implementing checks and balances to minimize model hallucinations. Source transparency is a key principle, with every claim supported by verifiable sources.
-
-## Efficiency at its Core
-
-SupplySignal's efficiency stems from its ability to process a vast amount of news in less time and with minimal energy consumption. Here's how:
-
-- **Batch Processing:** Filters down the news to a manageable batch for LLM processing (e.g., <10 articles per day).
+- **Batch Processing:** Filters vast amounts of news to a manageable batch (e.g., <10 articles per day) for LLM processing.
+  
+- **Geographically Pinpointed News:** Reduces search space by pinpointing news to relevant areas, streamlining information retrieval.
+  
+- **Keyword-Driven Topic Queries:** Precision in news topic queries using carefully defined keywords enhances the accuracy of relevant article identification.
   
 - **Location-Wise Clustering:** Simultaneously processes batches of relevant news clustered by location, optimizing efficiency.
+  
+- **Modular Architecture:** The solution's modular architecture allows for easy LLM switching without disrupting the overall data pipeline.
 
-- **Modular Architecture:** Easily switch out LLMs without disrupting the overall data pipeline, ensuring adaptability and scalability.
+### 3. User Experience
+
+- The value we provide is based on providing information you can *act on*. Thus, it is important that the results are easily viewed and understood. Our dashboard aims to achieve just this.
+- We value your feedback on the user experience. Try out the SupplySignal monitoring dashboard and share your opinions with us.
 
 **Stay Ahead with SupplySignal - Because Proactive is Better than Reactive!**
+
+---
