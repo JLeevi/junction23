@@ -16,7 +16,7 @@ EVENTS_JSON_LOCATION = "data/events.json"
 RISK_STATUS_JSON_LOCATION = "data/risk_status.json"
 
 
-def get_completion_for_location(location, articles):
+def get_completion_for_location_helper(location, articles):
     articles = get_articles_for_location(location, articles)
     prompts = get_prompts_for_location(location, articles)
     completion = openai_client.chat.completions.create(
@@ -25,9 +25,22 @@ def get_completion_for_location(location, articles):
         tool_choice=prompts["tool_choice"],
         model=MODEL_ID,
         max_tokens=750,
-        temperature=0.3
+        temperature=0.3,
+        timeout=15
     )
     return completion
+
+
+def get_completion_for_location(location, articles):
+    max_trials = 5
+    for i in range(max_trials):
+        try:
+            return get_completion_for_location_helper(location, articles)
+        except Exception as e:
+            print(f"------\nError getting completion: {e}")
+            print(f"Retrying ({i + 1}/{max_trials})------\n")
+    # Throw error if we can't get a completion after max_trials
+    raise Exception("Could not get completion afer max trials")
 
 
 def parse_risk_status_from_completion(completion):
