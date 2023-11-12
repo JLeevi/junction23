@@ -15,6 +15,13 @@ You monitor news articles for potentially disruptive events in {location_name}.
 If there is an event that could impact the company's operations, you need to mention it in your report.
 If the news don't contain important information, you MUST NOT mention it in your daily report.
 For important information, the location must match {location_name} and the event must be important.
+Example for how you would report on a natural disaster that is relevant to the company's operations in the region:
+    has_risk: true,
+    risk_title: "Potential disruption due to an earthquake in the region.",
+    risk_summary: "There was an earthquake in the region. The earthquake was 6.0 on the Richter scale. The earthquake was 100 km from {location_name}. Mining operations in the region are potentially disrupted.",
+    articles: [
+        ...
+    ]
 """
 
 
