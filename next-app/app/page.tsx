@@ -194,6 +194,37 @@ const MOCK_WITH_RISK: Factory[] = [
   },
 ]
 
+// If the new blob of factories has a new risk, return one new factory
+// Else, return undefined
+const tryGetNewRisk = (oldFactories: Factory[], newFactories: Factory[]) => {
+  const newRedAlerts = newFactories.filter((f) => f.risk_status.has_risk)
+  const oldRedAlerts = oldFactories.filter((f) => f.risk_status.has_risk)
+  // Don't focus on first render
+  if (oldFactories.length === 0) return
+  const newRedAlert = newRedAlerts.find(
+    (newF) =>
+      !oldRedAlerts.find((oldF) => oldF.location.city === newF.location.city),
+  )
+  return newRedAlert
+}
+
+const areOldAndNewFactoriesEqual = (
+  oldFactories: Factory[],
+  newFactories: Factory[],
+) => {
+  if (oldFactories.length !== newFactories.length) return false
+  return oldFactories.every((oldF) => {
+    const newF = newFactories.find(
+      (newF) => newF.location.city === oldF.location.city,
+    )
+    if (!newF) return false
+    return (
+      oldF.location.city === newF.location.city &&
+      oldF.risk_status.has_risk === newF.risk_status.has_risk
+    )
+  })
+}
+
 let useRisks = false
 
 export default function Home() {
@@ -204,19 +235,11 @@ export default function Home() {
   const [chosenFactory, setChosenFactory] = useState<Factory | null>(null)
   const pollInterval = 1000
 
-  // If the new blob of factories has a new risk, return one new factory
-  // Else, return undefined
-  const tryGetNewRisk = (oldFactories: Factory[], newFactories: Factory[]) => {
-    const newRedAlerts = newFactories.filter((f) => f.risk_status.has_risk)
-    const oldRedAlerts = oldFactories.filter((f) => f.risk_status.has_risk)
-    // Don't focus on first render
-    if (oldRedAlerts.length === 0) return
-    const newRedAlert = newRedAlerts.find(
-      (newF) =>
-        !oldRedAlerts.find((oldF) => oldF.location.city === newF.location.city),
-    )
-    return newRedAlert
-  }
+  const mapboxID = "mapbox-globe"
+  const mapContainer = useRef(null)
+  const map = useRef<mapboxgl.Map>(null)
+  const [markers, setMarkers] = useState<mapboxgl.Marker[]>([])
+  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string
 
   const focusToNewRisk = (newRisk: Factory) => {
     setChosenFactory(newRisk)
@@ -229,21 +252,33 @@ export default function Home() {
         "Content-Type": "application/json",
       },
     })
-    const json = (await response.json()) as ServerResponse
+    const newFactories = (await response.json()) as ServerResponse
+
+    // const newFactories = useRisks ? MOCK_WITH_RISK : MOCK_WITHOUT_RISK
+
+    const factoriesAreEqual = areOldAndNewFactoriesEqual(
+      factories,
+      newFactories,
+    )
+    if (factoriesAreEqual) return
 
     const oldFactories = factories
-    setFactories(json)
+    setFactories(
+      newFactories.sort(
+        (prev, curr) =>
+          Number(curr.risk_status.has_risk) - Number(prev.risk_status.has_risk),
+      ),
+    )
     if (!oldFactories) return
-    const newRisk = tryGetNewRisk(oldFactories, json)
+    const newRisk = tryGetNewRisk(oldFactories, newFactories)
     if (newRisk) focusToNewRisk(newRisk)
-    initializeMap()
   }
 
   useEffect(() => {
     // set useRisks to true after 10 seconds
     const timeoutId = setTimeout(() => {
       useRisks = true
-    }, 10000)
+    }, 5000)
     return () => clearTimeout(timeoutId)
   }, [])
 
@@ -256,14 +291,6 @@ export default function Home() {
     // Clean up the interval when the component is unmounted
     return () => clearInterval(intervalId)
   }, [factories])
-
-  // const [map, setMap] = useState<mapboxgl.Map>()
-  const mapboxID = "mapbox-globe"
-
-  const mapContainer = useRef(null)
-  const map = useRef<mapboxgl.Map>(null)
-
-  mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string
 
   const goToLocation = (
     latitude: number,
@@ -289,9 +316,6 @@ export default function Home() {
   }, [chosenFactory])
 
   const initializeMap = () => {
-    if (map.current) return // initialize map only once
-    if (factories.length === 0) return
-
     // ignore ts error for setting map.current
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -305,46 +329,38 @@ export default function Home() {
         name: "globe",
       },
     })
-    for (const factory of factories) {
-      // create a HTML element for each feature
-      const el = document.createElement("div")
-      el.className = "marker"
-
-      // make a marker for each feature and add to the map
-      new mapboxgl.Marker({
-        color: factory.risk_status.has_risk ? "#F87171" : "#34D399",
-      })
-        .setLngLat([
-          factory.location.coordinates.lon,
-          factory.location.coordinates.lat,
-        ])
-        .addTo(map.current)
-    }
   }
 
   useEffect(() => {
-    if (map.current) return // initialize map only once
     if (factories.length === 0) return
+    if (map.current) return // initialize map only once
     initializeMap()
   }, [factories])
 
   useEffect(() => {
-    if (factories.length === 0) return
-    for (const factory of factories) {
-      // create a HTML element for each feature
+    const currentMap = map.current
+    if (!currentMap) return // initialize map only once
+
+    // Delete previous markers from the map
+    markers.forEach((marker) => marker.remove())
+
+    const newMarkers = factories.map((factory) => {
       const el = document.createElement("div")
       el.className = "marker"
 
-      // make a marker for each feature and add to the map
-      new mapboxgl.Marker({
+      // make a marker for each factory and add to the map
+      const marker = new mapboxgl.Marker({
         color: factory.risk_status.has_risk ? "#F87171" : "#34D399",
       })
         .setLngLat([
           factory.location.coordinates.lon,
           factory.location.coordinates.lat,
         ])
-        .addTo(map.current as any)
-    }
+        .addTo(currentMap)
+      return marker
+    })
+
+    setMarkers(newMarkers)
   }, [factories])
 
   return (
