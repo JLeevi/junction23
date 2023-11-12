@@ -414,7 +414,7 @@ export default function Home() {
                       {factories.map((data, i) => (
                         <LineItem
                           {...data}
-                          key={crypto.randomUUID()}
+                          key={data.location.city}
                           flag={data.location.flag}
                           country={data.location.country}
                           city={data.location.city}
