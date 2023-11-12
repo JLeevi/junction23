@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
       },
     })
   } catch (error) {
@@ -50,6 +51,7 @@ async function fetchDataFromBlobStorage(
     BlobServiceClient.fromConnectionString(connectionString)
   const containerClient = blobServiceClient.getContainerClient(containerName)
   const blobClient = containerClient.getBlobClient(blobName)
+
   const downloadBlockBlobResponse = await blobClient.download(0)
 
   // Assuming the blob's content is text, not binary

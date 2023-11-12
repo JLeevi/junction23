@@ -277,6 +277,7 @@ export default function Home() {
       headers: {
         "Content-Type": "application/json",
       },
+      cache: "no-cache",
     })
     const newFactories = (await response.json()) as ServerResponse
 
