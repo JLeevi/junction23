@@ -1,7 +1,6 @@
 import { ChevronRightIcon } from "lucide-react"
 
 import { Button } from "./Button"
-import { Label } from "./Label"
 
 export interface LineData {
   flag: string
@@ -23,16 +22,22 @@ export const LineItem = ({
   riskStatus,
   onButtonClick,
 }: Props) => {
+  const pillarColor = riskStatus === "high" ? "bg-red-600" : "bg-green-600"
+
   return (
-    <div className="flex items-center justify-between gap-4 py-6">
-      <div className="flex flex-col gap-2 ">
-        <div className="flex items-center gap-3">
-          <h3 className="font-bold text-slate-900">
-            {flag} {city}, {country}
-          </h3>
-          <Label intent={riskStatus} />
+    <div className="flex items-center justify-between gap-2 py-6">
+      <div className="relative">
+        <div
+          className={`absolute left-0 h-full ${pillarColor} w-2 rounded-lg`}
+        ></div>
+        <div className="ml-6 flex flex-col gap-2 px-2 py-4">
+          <div className="flex items-center gap-3">
+            <h3 className="font-bold text-slate-900">
+              {flag} {city}, {country}
+            </h3>
+          </div>
+          <p className="text-sm text-slate-900">{summary}</p>
         </div>
-        <p className="text-sm text-slate-900">{summary}</p>
       </div>
       <Button onClick={onButtonClick} Icon={ChevronRightIcon} />
     </div>
