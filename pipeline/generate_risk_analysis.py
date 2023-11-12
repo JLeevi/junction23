@@ -1,7 +1,8 @@
 import json
+import asyncio
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, AsyncOpenAI
 from queries import NEWS_QUERIES
 from prompt_tools import get_prompts_for_location, get_articles_for_location
 from azure.storage.blob import BlobServiceClient
@@ -11,15 +12,15 @@ load_dotenv()
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 MODEL_ID = "gpt-3.5-turbo-1106"
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 EVENTS_JSON_LOCATION = "data/events.json"
 RISK_STATUS_JSON_LOCATION = "data/risk_status.json"
 
 
-def get_completion_for_location_helper(location, articles):
+async def aget_completion_for_location_helper(location, articles):
     articles = get_articles_for_location(location, articles)
     prompts = get_prompts_for_location(location, articles)
-    completion = openai_client.chat.completions.create(
+    completion = await openai_client.chat.completions.create(
         messages=prompts["messages"],
         tools=prompts["tools"],
         tool_choice=prompts["tool_choice"],
@@ -31,11 +32,12 @@ def get_completion_for_location_helper(location, articles):
     return completion
 
 
-def get_completion_for_location(location, articles):
+async def aget_completion_for_location(location, articles):
     max_trials = 5
     for i in range(max_trials):
         try:
-            return get_completion_for_location_helper(location, articles)
+            res = await aget_completion_for_location_helper(location, articles)
+            return res
         except Exception as e:
             print(f"------\nError getting completion: {e}")
             print(f"Retrying ({i + 1}/{max_trials})------\n")
@@ -52,7 +54,7 @@ def parse_risk_status_from_completion(completion):
         return {"has_risk": False}
 
 
-def main():
+async def main():
     connection_string = os.environ["BLOB_CONNECTION_STRING"]
     blob_service_client = BlobServiceClient.from_connection_string(
         connection_string)
@@ -62,17 +64,19 @@ def main():
         download_stream = blob_client.download_blob()
         file.write(download_stream.readall())
 
-    risk_statuses = []
     with open(EVENTS_JSON_LOCATION, "r") as json_file:
         all_events = json.load(json_file)
 
-    for query in NEWS_QUERIES:
-        completion = get_completion_for_location(query["location"], all_events)
-        risk_status = parse_risk_status_from_completion(completion)
-        risk_statuses.append({
+    query_tasks = [aget_completion_for_location(
+        query["location"], all_events) for query in NEWS_QUERIES]
+    tasks = await asyncio.gather(*query_tasks)
+
+    risk_statuses = [
+        {
             "location": query["location"],
-            "risk_status": risk_status
-        })
+            "risk_status": parse_risk_status_from_completion(completion)
+        } for completion, query in zip(tasks, NEWS_QUERIES)
+    ]
 
     with open(RISK_STATUS_JSON_LOCATION, "w") as json_file:
         json.dump(risk_statuses, json_file, indent=4)
@@ -83,4 +87,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
