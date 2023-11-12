@@ -8,6 +8,7 @@ import { Button } from "./Button"
 import { NewsCard } from "./NewsCard"
 
 interface Props extends ComponentProps<"div"> {
+  flag: string
   city: string
   country: string
   riskStatus: RiskStatus
@@ -16,6 +17,7 @@ interface Props extends ComponentProps<"div"> {
 }
 
 export const Summary = ({
+  flag,
   city,
   country,
   riskStatus,
@@ -28,7 +30,7 @@ export const Summary = ({
       <div className="flex justify-between gap-4">
         <div className="flex flex-col gap-2">
           <h3 className="text-3xl font-semibold text-slate-800">
-            {city}, {country}
+            {flag} {city}, {country}
           </h3>
           {riskStatus.has_risk ? (
             <h4 className="text-lg font-medium text-red-800">

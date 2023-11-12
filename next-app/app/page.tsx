@@ -397,6 +397,7 @@ export default function Home() {
                       <LineItem
                         {...data}
                         key={crypto.randomUUID()}
+                        flag={data.location.flag}
                         country={data.location.country}
                         city={data.location.city}
                         summary={
@@ -418,6 +419,7 @@ export default function Home() {
                 <Card>
                   <div className="flex flex-col divide-y-[1px] divide-slate-300 px-6 ">
                     <Summary
+                      flag={chosenFactory.location.flag}
                       city={chosenFactory.location.city}
                       country={chosenFactory.location.country}
                       riskStatus={chosenFactory.risk_status}
