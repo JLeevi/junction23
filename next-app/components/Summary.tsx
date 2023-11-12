@@ -24,23 +24,34 @@ export const Summary = ({
   ...props
 }: Props) => {
   return (
-    <div className="flex flex-col gap-6 py-6">
+    <div className="flex flex-col gap-8 py-6">
       <div className="flex justify-between gap-4">
-        <h3 className="text-3xl font-semibold text-slate-800">
-          {city}, {country}
-        </h3>
+        <div className="flex flex-col gap-2">
+          <h3 className="text-3xl font-semibold text-slate-800">
+            {city}, {country}
+          </h3>
+          {riskStatus.has_risk ? (
+            <h4 className="text-lg font-medium text-red-800">
+              {riskStatus.risk_title}
+            </h4>
+          ) : (
+            <h4 className="text-lg font-medium text-green-700">
+              Status stable
+            </h4>
+          )}
+        </div>
         <Button onClick={onBackButtonClick} Icon={X} />
       </div>
-      <div className="flex flex-col gap-2">
-        <h4 className="text-sm font-bold">Summary</h4>
-        <p className="text-base font-normal">
-          {riskStatus.has_risk ? riskStatus.risk_summary : "Status stable"}
-        </p>
-      </div>
-      <div className="flex flex-col gap-2">
-        {articles.length > 0 && (
+      {riskStatus.has_risk && (
+        <div className="flex flex-col gap-2">
+          <h4 className="text-base font-bold">Summary</h4>
+          <p className="text-base font-normal">{riskStatus.risk_summary}</p>
+        </div>
+      )}
+      {articles.length > 0 && (
+        <div className="flex flex-col gap-2">
           <>
-            <h4 className="text-sm font-bold">Sources</h4>
+            <h4 className="text-base font-bold">Sources</h4>
             {articles.map((article) => {
               return (
                 <NewsCard
@@ -52,8 +63,8 @@ export const Summary = ({
               )
             })}
           </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
