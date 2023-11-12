@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function fetchDataFromBlobStorage(
+async function fetchDataFromBlobStorage(
   containerName: string,
   blobName: string,
 ) {
